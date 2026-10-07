@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08090b">
+<title>Martín Car Care — Catálogo de limpieza y estética automotor</title>
+<meta name="description" content="Catálogo interactivo de productos de limpieza y estética automotor. Elegí la zona del auto, armá tu kit y pedilo por WhatsApp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Sombreado compartido por los dibujos de envases -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="sh" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity=".38"/>
+      <stop offset=".2" stop-color="#fff" stop-opacity=".4"/>
+      <stop offset=".44" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".76" stop-color="#000" stop-opacity=".1"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".45"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<a class="salto" href="#catalogo">Ir al catálogo</a>
+
+<header class="top">
+  <a class="marca" href="#hero" aria-label="Inicio">
+    <span class="marca__gota" aria-hidden="true"></span>
+    <b data-tienda="nombre">MARTÍN</b>
+    <i data-tienda="bajada">Car Care</i>
+  </a>
+  <nav class="top__nav" aria-label="Secciones">
+    <a href="#mapa">Zonas</a>
+    <a href="#catalogo">Catálogo</a>
+  </nav>
+  <button class="top__kit" id="btnKit" type="button" aria-label="Abrir mi kit">
+    Mi kit <span id="kitN">0</span>
+  </button>
+</header>
+
+<main>
+
+  <!-- ============ HERO: se lava con el dedo ============ -->
+  <section class="hero" id="hero">
+    <div class="hero__env" id="heroEnv" aria-hidden="true"></div>
+
+    <div class="hero__txt">
+      <p class="kicker">Catálogo 2026 · Limpieza y estética automotor</p>
+      <h1>Dejalo<br>como<br><em>nuevo.</em></h1>
+      <p class="hero__sub"><span id="heroTotal">50</span> productos para lavar, corregir y proteger. Elegí la zona del auto, armá tu kit y pedilo por WhatsApp.</p>
+      <a class="btn btn--ac" href="#mapa">Ver el catálogo <span aria-hidden="true">↓</span></a>
+    </div>
+
+    <canvas id="espuma" class="hero__espuma" aria-hidden="true"></canvas>
+
+    <div class="hero__pista" aria-hidden="true">
+      <span class="hero__dedo"></span>
+      <strong>Pasá el dedo</strong>
+      <small>y lavá la pantalla</small>
+    </div>
+
+    <div class="hero__medidor" aria-hidden="true">
+      <span>Limpieza <b id="espumaPct">0%</b></span>
+      <i><u id="espumaBarra"></u></i>
+    </div>
+    <button class="hero__saltar" id="espumaSaltar" type="button">Saltar <span aria-hidden="true">›</span></button>
+  </section>
+
+  <div class="cinta" aria-hidden="true">
+    <div class="cinta__pista">
+      <span>Lavar</span><span>Descontaminar</span><span>Pulir</span><span>Proteger</span><span>Llantas</span><span>Vidrios</span><span>Interior</span><span>Motor</span>
+      <span>Lavar</span><span>Descontaminar</span><span>Pulir</span><span>Proteger</span><span>Llantas</span><span>Vidrios</span><span>Interior</span><span>Motor</span>
+    </div>
+  </div>
+
+  <!-- ============ MAPA: elegí la zona del auto ============ -->
+  <section class="sec mapa" id="mapa">
+    <p class="kicker rev">01 — Elegí la zona</p>
+    <h2 class="rev">¿Qué parte querés<br>dejar impecable?</h2>
+
+    <div class="auto rev" id="auto" data-zona="todo">
+      <div class="auto__lienzo">
+        <svg class="auto__svg" viewBox="8 124 1008 404" role="img" aria-label="Fiat Cronos de perfil con zonas para elegir">
+          <defs>
+            <linearGradient id="gCarro" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#a3a9b3"/><stop offset=".34" stop-color="#70767f"/><stop offset=".7" stop-color="#3e434b"/><stop offset="1" stop-color="#1b1e23"/>
+            </linearGradient>
+            <linearGradient id="gVidrio" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#56636f"/><stop offset="1" stop-color="#12161b"/>
+            </linearGradient>
+          </defs>
+          <ellipse class="auto__sombra" cx="512" cy="514" rx="490" ry="13"/>
+          <path class="auto__antena" d="M322 178L308 133"/>
+
+          <!-- carrocería calcada del Cronos: capot corto, techo caído y baúl alto con alerón -->
+          <path class="auto__carro" fill="url(#gCarro)" d="M158 456L60 440Q34 432 30 405L30 372Q31 340 44 310L50 270L46 257L76 256Q120 250 152 243Q215 205 290 183Q350 172 430 171L540 172Q590 176 618 192L760 268Q850 280 925 308Q975 328 990 348Q998 380 996 420Q995 448 980 458L903 456A80 80 0 1 0 745 456L316 456A80 80 0 1 0 158 456Z"/>
+          <path class="auto__luz" d="M262 300L716 296L714 338Q500 348 300 372Z"/>
+          <path class="auto__capot" d="M762 271Q850 282 925 310Q975 330 989 350L986 361Q930 331 860 316Q800 296 730 290Z"/>
+          <path class="auto__reflejo" d="M862 318Q700 298 500 292L140 288"/>
+          <path class="auto__linea auto__linea--suave" d="M330 412Q520 398 716 400"/>
+          <path fill="#07080a" d="M316 441L745 441L745 456L316 456Z"/>
+          <path fill="#07080a" d="M60 440Q40 434 33 414L150 430L158 456Z"/>
+
+          <!-- vidrios: parabrisas, luneta y tres paños con parantes negros -->
+          <path class="auto__vidrio" fill="#0e1116" d="M612 191L758 268L740 268L606 197Z"/>
+          <path class="auto__vidrio" fill="#0e1116" d="M286 186Q215 207 156 243L178 243Q228 213 292 192Z"/>
+          <path fill="#08090c" d="M668 281L640 240Q610 200 565 195L330 196Q282 198 262 225Q250 245 262 262L450 270Z"/>
+          <path class="auto__vidrio" fill="url(#gVidrio)" d="M660 279L634 240Q606 204 566 199L482 199L488 272Z"/>
+          <path class="auto__vidrio" fill="url(#gVidrio)" d="M445 199L336 200L338 264L450 268.5Z"/>
+          <path class="auto__vidrio" fill="url(#gVidrio)" d="M326 200Q286 202 268 226Q258 244 268 260L328 263.5Z"/>
+          <g class="auto__asiento">
+            <path d="M548 275q-12-40 0-58q14-8 20 6l12 53z"/>
+            <path d="M392 267q-10-36 0-52q14-8 20 6l10 48z"/>
+            <path class="auto__volante" d="M604 277a22 22 0 0 1 24-20"/>
+          </g>
+
+          <path class="auto__linea" d="M246 238Q252 300 306 366M468 271L492 441M718 283Q724 360 712 441M760 270Q820 286 860 313"/>
+          <circle class="auto__linea" cx="212" cy="313" r="21"/>
+          <rect class="auto__manija" x="272" y="286" width="56" height="10" rx="5"/>
+          <rect class="auto__manija" x="490" y="294" width="56" height="10" rx="5"/>
+          <path d="M640 262Q642 250 660 250L684 254Q696 258 694 270L690 282L652 280Q640 276 640 262Z" fill="#0b0c0f" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+
+          <!-- ópticas, parrilla y tomas -->
+          <path d="M52 284L128 283Q140 285 136 292Q110 312 80 318Q60 316 52 300Z" fill="#ff3b3b"/>
+          <path d="M60 290L122 289Q104 302 82 307Q66 305 60 296Z" fill="#ff8a8a" opacity=".7"/>
+          <rect x="34" y="386" width="34" height="9" rx="3" fill="#b3202a"/>
+          <path d="M857 313Q920 322 984 348L986 362Q950 362 925 352Q880 335 857 313Z" fill="#0b0c0f"/>
+          <path d="M862 316Q920 325 980 348" fill="none" stroke="#fff4cf" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M952 370L994 367L994 394L964 398Z" fill="#07080a"/>
+          <path d="M940 412L995 408L992 440L950 446Z" fill="#07080a"/>
+
+          <g class="auto__rueda" transform="translate(237 443)">
+            <circle r="70"/>
+            <circle class="auto__llanta" r="50"/>
+            <path class="auto__rayo" d="M0 0L-6.4-45.6M0 0L6.4-45.6M0 0L41.3-20.2M0 0L45.3-8M0 0L32 33.1M0 0L21.6 40.6M0 0L-21.6 40.6M0 0L-32 33.1M0 0L-45.3-8M0 0L-41.3-20.2"/>
+            <circle class="auto__centro" r="9"/>
+          </g>
+          <g class="auto__rueda" transform="translate(824 443)">
+            <circle r="70"/>
+            <circle class="auto__llanta" r="50"/>
+            <path class="auto__rayo" d="M0 0L-6.4-45.6M0 0L6.4-45.6M0 0L41.3-20.2M0 0L45.3-8M0 0L32 33.1M0 0L21.6 40.6M0 0L-21.6 40.6M0 0L-32 33.1M0 0L-45.3-8M0 0L-41.3-20.2"/>
+            <circle class="auto__centro" r="9"/>
+          </g>
+        </svg>
+
+        <button class="punto" type="button" data-zona="carroceria" style="left:45.8%;top:58.4%"><span>Carrocería</span></button>
+        <button class="punto" type="button" data-zona="vidrios"    style="left:54.8%;top:28.2%"><span>Vidrios</span></button>
+        <button class="punto" type="button" data-zona="interior"   style="left:38.1%;top:27.2%"><span>Interior</span></button>
+        <button class="punto" type="button" data-zona="motor"      style="left:86.5%;top:48%"><span>Motor</span></button>
+        <button class="punto" type="button" data-zona="ruedas"     style="left:22.7%;top:79%"><span>Llantas</span></button>
+      </div>
+
+      <p class="auto__modelo">Fiat Cronos · hecho en Córdoba</p>
+
+<p class="auto__info" aria-live="polite">
+        <b id="zonaNombre">Todo el auto</b>
+        <span id="zonaFrase">El catálogo completo, de punta a punta.</span>
+      </p>
+    </div>
+
+    <div class="pildoras rev" id="zonas" role="group" aria-label="Zonas del auto"></div>
+  </section>
+
+  <!-- ============ CATÁLOGO ============ -->
+  <section class="sec catalogo" id="catalogo">
+    <p class="kicker">02 — Elegí el producto</p>
+    <div class="catalogo__cab">
+      <h2 id="catTitulo">Todo el auto</h2>
+      <p class="catalogo__cuenta" id="catCuenta" aria-live="polite"></p>
+    </div>
+
+    <div class="barra" id="barra">
+      <div class="barra__fila">
+        <label class="buscar">
+          <span class="vh">Buscar producto</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+          <input id="q" type="search" placeholder="Buscar producto…" autocomplete="off" enterkeyhint="search">
+        </label>
+        <label class="orden">
+          <span class="vh">Ordenar</span>
+          <select id="orden">
+            <option value="rel">Sugeridos</option>
+            <option value="menor">Menor precio</option>
+            <option value="mayor">Mayor precio</option>
+            <option value="az">A → Z</option>
+          </select>
+        </label>
+      </div>
+      <div class="chips" id="chips" role="group" aria-label="Etapas"></div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <!-- ============ CIERRE ============ -->
+  <section class="sec cierre">
+    <p class="kicker rev">03 — Pedilo</p>
+    <h2 class="rev">¿Armamos<br>tu kit?</h2>
+    <p class="cierre__txt rev">Sumá productos con el <b>+</b> y mandanos la lista por WhatsApp. Te confirmamos stock, precio y envío en el momento.</p>
+    <div class="cierre__acc rev">
+      <button class="btn btn--ac" type="button" id="btnKit2">Ver mi kit</button>
+      <a class="btn btn--linea" id="waDirecto" target="_blank" rel="noopener">Consultar por WhatsApp</a>
+    </div>
+  </section>
+</main>
+
+<footer class="pie">
+  <p><b data-tienda="nombre">MARTÍN</b> <span data-tienda="bajada">Car Care</span> · <span data-tienda="ciudad">Buenos Aires</span></p>
+  <p class="pie__nota">Demo de catálogo. Precios y productos de ejemplo.</p>
+  <button class="pie__carga" type="button" id="btnCarga">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    Cargar productos
+  </button>
+</footer>
+
+<!-- Barra flotante del kit -->
+<button class="kitbar" id="kitbar" type="button" aria-label="Abrir mi kit">
+  <span class="kitbar__n" id="kitbarN">0</span>
+  <span class="kitbar__t">Mi kit</span>
+  <span class="kitbar__p" id="kitbarP">$0</span>
+  <span class="kitbar__f" aria-hidden="true">→</span>
+</button>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- ============ FICHA DE PRODUCTO ============ -->
+<div class="ov" id="ovProd" aria-hidden="true">
+  <div class="ov__fondo" data-cerrar></div>
+  <section class="hoja hoja--prod" role="dialog" aria-modal="true" aria-labelledby="prodTit">
+    <div class="hoja__agarre" data-agarre><i></i></div>
+    <button class="x" type="button" data-cerrar aria-label="Cerrar">×</button>
+    <div class="hoja__scroll" id="prodCuerpo"></div>
+    <div class="compra" id="prodCompra"></div>
+  </section>
+</div>
+
+<!-- ============ MI KIT ============ -->
+<div class="ov" id="ovKit" aria-hidden="true">
+  <div class="ov__fondo" data-cerrar></div>
+  <section class="hoja hoja--kit" role="dialog" aria-modal="true" aria-labelledby="kitTit">
+    <div class="hoja__agarre" data-agarre><i></i></div>
+    <header class="hoja__cab">
+      <div>
+        <p class="kicker">Tu pedido</p>
+        <h2 id="kitTit">Mi kit</h2>
+      </div>
+      <button class="x x--fija" type="button" data-cerrar aria-label="Cerrar">×</button>
+    </header>
+    <div class="hoja__scroll" id="kitCuerpo"></div>
+    <div class="compra compra--kit" id="kitPie"></div>
+  </section>
+</div>
+
+<!-- ============ PANEL DE CARGA ============ -->
+<div class="ov" id="ovCarga" aria-hidden="true">
+  <div class="ov__fondo" data-cerrar></div>
+  <section class="hoja hoja--carga" role="dialog" aria-modal="true" aria-labelledby="cargaTit">
+    <header class="hoja__cab">
+      <div>
+        <p class="kicker">Panel de carga · demo</p>
+        <h2 id="cargaTit">Cargar productos</h2>
+      </div>
+      <button class="x x--fija" type="button" data-cerrar aria-label="Cerrar">×</button>
+    </header>
+
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" data-tab="nuevo" aria-selected="true">Nuevo</button>
+      <button type="button" role="tab" data-tab="excel" aria-selected="false">Pegar de Excel</button>
+      <button type="button" role="tab" data-tab="lista" aria-selected="false">Lista <span id="cargaN"></span></button>
+    </div>
+
+    <div class="hoja__scroll">
+      <!-- Nuevo / editar -->
+      <form class="tabp form" id="fProd" data-panel="nuevo" novalidate>
+        <div class="form__previa">
+          <div class="form__dibujo" id="fPrevia"></div>
+          <div>
+            <p class="form__modo" id="fModo">Producto nuevo</p>
+            <p class="form__ayuda">Con nombre, categoría y precio alcanza. El dibujo y el código se arman solos.</p>
+          </div>
+        </div>
+
+        <label class="campo campo--ancho">Nombre *
+          <input name="nombre" required maxlength="80" placeholder="Ej: Shampoo Neutro pH7">
+        </label>
+        <label class="campo">Categoría *
+          <select name="categoria" id="fCat"></select>
+        </label>
+        <label class="campo">Precio *
+          <input name="precio" required inputmode="numeric" placeholder="13900">
+        </label>
+        <label class="campo">Tamaño
+          <input name="tamano" maxlength="24" placeholder="500 ml">
+        </label>
+        <label class="campo">Envase (dibujo)
+          <select name="envase" id="fEnv"></select>
+        </label>
+        <label class="campo campo--ancho">Descripción
+          <textarea name="descripcion" rows="3" maxlength="260" placeholder="Qué hace y por qué conviene."></textarea>
+        </label>
+        <label class="campo campo--ancho">Cómo se usa
+          <textarea name="uso" rows="2" maxlength="220" placeholder="Pasos cortos de aplicación."></textarea>
+        </label>
+        <label class="campo campo--ancho">Datos cortos (separados por coma)
+          <input name="tags" maxlength="90" placeholder="pH neutro, Dil. 1:200">
+        </label>
+        <div class="campo campo--ancho campo--foto">
+          <span>Foto (opcional, reemplaza al dibujo)</span>
+          <div class="foto">
+            <label class="btn btn--linea btn--ch">Elegir foto<input type="file" id="fFoto" accept="image/*" hidden></label>
+            <button type="button" class="btn btn--txt" id="fFotoQuitar" hidden>Quitar foto</button>
+          </div>
+        </div>
+        <label class="check campo--ancho"><input type="checkbox" name="destacado"> Destacado (sale en grande)</label>
+
+        <p class="form__error campo--ancho" id="fError" role="alert" hidden></p>
+        <div class="form__acc campo--ancho">
+          <button class="btn btn--ac" type="submit" id="fGuardar">Agregar al catálogo</button>
+          <button class="btn btn--txt" type="button" id="fCancelar" hidden>Cancelar edición</button>
+        </div>
+      </form>
+
+      <!-- Pegar de Excel -->
+      <div class="tabp" data-panel="excel" hidden>
+        <p class="form__ayuda">Copiá las filas de tu Excel o Google Sheets y pegalas acá. Columnas, en este orden:</p>
+        <p class="columnas"><span>Nombre</span><span>Categoría</span><span>Precio</span><span>Tamaño</span><span>Descripción</span></p>
+        <label class="campo campo--ancho"><span class="vh">Filas pegadas</span>
+          <textarea id="xTexto" rows="9" spellcheck="false" placeholder="Shampoo Neutro pH7&#9;Lavado&#9;13900&#9;1 L&#9;Alta lubricación, no saca la cera"></textarea>
+        </label>
+        <p class="form__ayuda" id="xInfo">Todavía no pegaste nada.</p>
+        <div class="form__acc">
+          <button class="btn btn--ac" type="button" id="xAgregar" disabled>Agregar productos</button>
+        </div>
+      </div>
+
+      <!-- Lista -->
+      <div class="tabp" data-panel="lista" hidden>
+        <label class="buscar buscar--panel">
+          <span class="vh">Buscar en la lista</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+          <input id="lQ" type="search" placeholder="Buscar para editar o borrar…" autocomplete="off">
+        </label>
+        <ul class="lista" id="lLista"></ul>
+      </div>
+    </div>
+
+    <footer class="carga__pie">
+      <p id="cargaEstado"></p>
+      <div>
+        <button class="btn btn--ac btn--ch" type="button" id="btnExportar">Descargar productos.js</button>
+        <button class="btn btn--linea btn--ch" type="button" id="btnRestaurar">Restaurar original</button>
+      </div>
+    </footer>
+  </section>
+</div>
+
+<script src="config.js"></script>
+<script src="productos.js"></script>
+<script src="app.js"></script>
+<script src="cargador.js"></script>
+</body>
+</html>
