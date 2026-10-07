@@ -406,6 +406,40 @@ a { color: inherit; -webkit-tap-highlight-color: transparent; }
 .sugeridos span { flex: none; font: 500 11px/1 var(--fm); letter-spacing: .08em; text-transform: uppercase; color: var(--mu); }
 .sugeridos button { flex: none; height: 36px; padding: 0 12px; border-radius: 999px; background: var(--p2); font-size: 14px; }
 
+/* ---------- asistente "Armá tu rutina" ---------- */
+.guia {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  width: 100%; min-height: 66px; margin-bottom: 22px; padding: 12px 18px;
+  border: 1px solid var(--ac); border-radius: var(--r); text-align: left;
+  background: linear-gradient(100deg, rgba(255, 90, 31, .22), transparent 70%), var(--p1);
+  transition: transform .2s var(--sua);
+}
+.guia:active { transform: scale(.98); }
+.guia span { display: grid; gap: 4px; font-size: 14px; color: #cfcbc2; }
+.guia b { font: 900 24px/1 var(--fd); text-transform: uppercase; color: var(--tx); }
+.guia i { flex: none; font: 500 22px/1 var(--fm); font-style: normal; color: var(--ac); }
+.guia__avance { height: 3px; margin: 0 18px 6px; background: var(--p2); border-radius: 3px; overflow: hidden; }
+.guia__avance i { display: block; height: 100%; width: 0; background: var(--ac); transition: width .35s var(--sua); }
+.guia__preg { margin: 14px 18px 16px; font: 900 clamp(30px, 9vw, 40px)/1.04 var(--fd); text-transform: uppercase; }
+#guiaPie:not(:has(button)) { display: none; }
+.guia__ops { display: grid; gap: 10px; padding: 0 18px 22px; }
+.guia__ops button {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 64px; padding: 12px 18px; text-align: left;
+  border: 1px solid var(--ln); border-radius: 16px; background: var(--p2);
+  font: 600 17px/1.25 var(--fb);
+  transition: border-color .2s, background .2s, transform .2s var(--sua);
+}
+.guia__ops button:active { transform: scale(.98); }
+.guia__ops i { flex: none; font-style: normal; color: var(--ac); font: 500 20px/1 var(--fm); }
+.guia__lista .kit__item { grid-template-columns: 54px 1fr; }
+.kit__aviso { margin: 0 18px 12px; padding: 14px; border: 1px solid var(--ac); border-radius: 16px; background: rgba(255, 90, 31, .1); }
+.kit__aviso p { font-size: 15px; line-height: 1.4; }
+.kit__aviso div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+@media (hover: hover) {
+  .guia__ops button:hover { border-color: var(--ac); }
+}
+
 /* ---------- kits armados ---------- */
 .combos { margin-top: 22px; }
 .combos__tit { display: flex; align-items: baseline; gap: 10px; font: 800 26px/1 var(--fd); text-transform: uppercase; letter-spacing: .01em; }
@@ -844,6 +878,7 @@ a { color: inherit; -webkit-tap-highlight-color: transparent; }
   }
   .hoja--carga { width: min(600px, 94vw); }
   .hoja--kit .hoja__agarre { display: none; }
+  .guia { max-width: 560px; }
 }
 /* pantalla ancha y apaisada: texto a la izquierda, envases a la derecha */
 @media (min-width: 900px) and (orientation: landscape) {

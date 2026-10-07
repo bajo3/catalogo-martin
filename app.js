@@ -24,7 +24,8 @@
   const escribir = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } };
 
   const estado = { mundo: MUNDOS[0].id, zona: 'todo', cat: 'todo', q: '', orden: 'rel', ofertas: false, kit: leer(K_KIT, {}), nota: leer(K_NOTA, ''),
-    datos: { nombre: '', entrega: 'retiro', direccion: '', ...leer(K_DATOS, {}) } };
+    datos: { nombre: '', entrega: 'retiro', direccion: '', ...leer(K_DATOS, {}) },
+    pendiente: null }; // pedido que llegó por link y espera decisión
   let crudos = leer(K_PROD, null);
   let hayCambios = Array.isArray(crudos);
   if (!hayCambios) crudos = PRODUCTOS;
@@ -311,17 +312,24 @@
 
   /* ---------- kits armados ---------- */
   const combos = typeof COMBOS === 'undefined' ? [] : COMBOS;
-  const comboItems = c => c.productos.map(ref => {
+  const rutinas = typeof RUTINAS === 'undefined' ? {} : RUTINAS;
+  // "Nombre" o "Nombre|tamaño" -> producto (los agotados quedan afuera)
+  const porRefs = refs => refs.map(ref => {
     const [nom, tam] = ref.split('|').map(x => plano(x).trim());
     return P.find(p => plano(p.nombre) === nom && (!tam || plano(p.tamano) === tam));
   }).filter(p => p && !p.sinStock);
+  const comboItems = c => porRefs(c.productos);
 
   function pintarCombos() {
     const caja = $('#combos');
     const ver = !estado.q && estado.zona === 'todo' && estado.cat === 'todo';
     const lista = ver ? combos.filter(c => c.mundo === estado.mundo).map(c => ({ c, items: comboItems(c) })).filter(x => x.items.length > 1) : [];
-    caja.hidden = !lista.length;
-    caja.innerHTML = lista.length ? `<h3 class="combos__tit">Kits armados <span>Un toque y sumás todo</span></h3>
+    const guia = ver && (rutinas[estado.mundo] || []).length
+      ? `<button class="guia" type="button" data-guia>
+          <span><b>¿No sabés qué llevar?</b>Armá tu rutina en ${rutinas[estado.mundo].length} preguntas</span><i aria-hidden="true">→</i>
+        </button>` : '';
+    caja.hidden = !lista.length && !guia;
+    caja.innerHTML = guia + (lista.length ? `<h3 class="combos__tit">Kits armados <span>Un toque y sumás todo</span></h3>
       <div class="combos__fila">${lista.map(({ c, items }) => `
         <article class="combo" style="--c:${items[0].color}">
           <div class="combo__img" aria-hidden="true">${items.slice(0, 4).map(p => `<span style="--c:${p.color}">${visual(p)}</span>`).join('')}</div>
@@ -329,7 +337,7 @@
           <p>${esc(c.frase)}</p>
           <ul>${items.map(p => `<li>${esc(p.nombre)}</li>`).join('')}</ul>
           <button class="btn btn--ac btn--ch" type="button" data-combo="${esc(c.id)}">Sumar kit · ${fmt(items.reduce((t, p) => t + p.precio, 0))}</button>
-        </article>`).join('')}</div>` : '';
+        </article>`).join('')}</div>` : '');
   }
 
   function pintarGrilla() {
@@ -386,7 +394,16 @@
     $('#kitbar').classList.toggle('visible', cant > 0);
     $('#kitbar').setAttribute('aria-label', `Abrir mi kit: ${cant} productos, ${fmt(total)}`);
 
-    $('#kitCuerpo').innerHTML = items.length
+    const pend = estado.pendiente ? Object.keys(estado.pendiente).length : 0;
+    const aviso = pend ? `<div class="kit__aviso">
+        <p><b>Te compartieron un pedido</b> con ${pend} ${pend === 1 ? 'producto' : 'productos'}. Ya tenés cosas en tu kit: ¿qué hacemos?</p>
+        <div>
+          <button class="btn btn--ac btn--ch" type="button" data-pend="sumar">Sumarlo al mío</button>
+          <button class="btn btn--linea btn--ch" type="button" data-pend="reemplazar">Reemplazar el mío</button>
+          <button class="btn btn--txt" type="button" data-pend="descartar">Descartar</button>
+        </div>
+      </div>` : '';
+    $('#kitCuerpo').innerHTML = aviso + (items.length
       ? `<ul class="kit__lista">${items.map(({ p, n }) => `
           <li class="kit__item" style="--c:${p.color}" data-id="${esc(p.id)}">
             ${visual(p)}
@@ -413,10 +430,11 @@
             <textarea id="kitNota" rows="2" maxlength="240" placeholder="Ej: lo paso a buscar el sábado a la mañana.">${esc(estado.nota)}</textarea>
           </label>
         </div>`
-      : `<div class="kit__vacio"><b>Tu kit está vacío</b><p>Tocá el + en cualquier producto para empezar a armarlo.</p></div>`;
+      : `<div class="kit__vacio"><b>Tu kit está vacío</b><p>Tocá el + en cualquier producto para empezar a armarlo.</p></div>`);
 
     $('#kitPie').innerHTML = items.length
       ? `<div class="compra__precio"><small>Total estimado · ${cant} ${cant === 1 ? 'producto' : 'productos'}</small><b>${fmt(total)}</b></div>
+         <button class="btn btn--txt" type="button" data-compartir-kit>Compartir</button>
          <button class="btn btn--txt" type="button" data-vaciar>Vaciar</button>
          <a class="btn btn--ac" href="${esc(linkWA(mensajeWA()))}" target="_blank" rel="noopener">Pedir por WhatsApp</a>`
       : `<button class="btn btn--linea" type="button" data-cerrar style="flex:1">Seguir mirando</button>`;
@@ -542,12 +560,7 @@
   /* ---------- link propio de cada producto y compartir ---------- */
   const linkProducto = p => `${location.origin}${location.pathname}?p=${encodeURIComponent(p.id)}`;
 
-  async function compartir(p) {
-    const datos = {
-      title: `${p.nombre} — ${TIENDA.nombre} ${TIENDA.bajada}`,
-      text: `${p.nombre}${p.tamano ? ` (${p.tamano})` : ''} · ${fmt(p.precio)}`,
-      url: linkProducto(p),
-    };
+  async function compartir(datos) {
     try {
       if (navigator.share) return await navigator.share(datos);
       await navigator.clipboard.writeText(datos.url);
@@ -556,12 +569,35 @@
       if (e.name !== 'AbortError') toast('No se pudo compartir el link');
     }
   }
+  const compartirProducto = p => compartir({
+    title: `${p.nombre} — ${TIENDA.nombre} ${TIENDA.bajada}`,
+    text: `${p.nombre}${p.tamano ? ` (${p.tamano})` : ''} · ${fmt(p.precio)}`,
+    url: linkProducto(p),
+  });
+  // el pedido viaja en el link como  producto~cantidad_producto~cantidad
+  const compartirKit = () => compartir({
+    title: `Pedido — ${TIENDA.nombre} ${TIENDA.bajada}`,
+    text: `Mi pedido: ${kitCant()} productos · ${fmt(kitTotal())}`,
+    url: `${location.origin}${location.pathname}?k=${encodeURIComponent(kitItems().map(({ p, n }) => `${p.id}~${n}`).join('_'))}`,
+  });
 
   // si entran con el link de un producto, se abre su ficha
   function abrirDesdeLink() {
-    const id = new URLSearchParams(location.search).get('p');
-    if (!id) return;
+    const pars = new URLSearchParams(location.search), id = pars.get('p'), k = pars.get('k');
+    if (!id && !k) return;
     history.replaceState(null, '', location.pathname);
+    if (k) {
+      const pedido = {};
+      k.split('_').forEach(par => {
+        const [pid, n] = par.split('~'), p = porId(pid);
+        if (p && !p.sinStock) pedido[pid] = Math.max(1, Math.min(99, Number(n) || 1));
+      });
+      if (!Object.keys(pedido).length) return toast('Ese pedido ya no está disponible');
+      if (kitCant()) estado.pendiente = pedido;
+      else { estado.kit = pedido; escribir(K_KIT, estado.kit); pintarGrilla(); toast('Pedido cargado desde el link'); }
+      pintarKit();
+      return abrir($('#ovKit'));
+    }
     const p = porId(id);
     if (!p) return;
     elegirMundo(mundoDe(p));
@@ -605,6 +641,39 @@
     history.replaceState({ hoja: true }, '', `?p=${encodeURIComponent(id)}`);
     $('#prodCuerpo').scrollTop = 0;
     const info = $('.prod__info', ov); if (info) info.scrollTop = 0;
+  }
+
+  /* ---------- asistente "Armá tu rutina" ---------- */
+  const guia = { paso: 0, elegidas: [] };
+  const guiaItems = () => [...new Set(guia.elegidas.flatMap(o => porRefs(o.suma)))];
+
+  function pintarGuia() {
+    const pasos = rutinas[estado.mundo] || [], fin = guia.paso >= pasos.length;
+    const items = fin ? guiaItems() : [];
+    $('#guiaPaso').textContent = fin ? 'Tu rutina' : `Pregunta ${guia.paso + 1} de ${pasos.length}`;
+    $('#guiaBarra').style.width = `${Math.round((fin ? 1 : guia.paso / pasos.length) * 100)}%`;
+    $('#guiaCuerpo').innerHTML = !fin
+      ? `<h3 class="guia__preg">${esc(pasos[guia.paso].pregunta)}</h3>
+         <div class="guia__ops">${pasos[guia.paso].opciones.map((o, i) =>
+           `<button type="button" data-op="${i}">${esc(o.texto)}<i aria-hidden="true">→</i></button>`).join('')}</div>`
+      : items.length
+        ? `<h3 class="guia__preg">Esto es lo que te conviene llevar</h3>
+           <ul class="kit__lista guia__lista">${items.map(p => `
+             <li class="kit__item" style="--c:${p.color}">${visual(p)}
+               <div><b>${esc(p.nombre)}</b><span>${esc(p.tamano)}${p.tamano ? ' · ' : ''}${fmt(p.precio)}</span></div>
+             </li>`).join('')}</ul>`
+        : `<div class="kit__vacio"><b>Con eso estás</b><p>Con tus respuestas no hace falta sumar nada. Podés empezar de nuevo o mirar el catálogo.</p></div>`;
+    $('#guiaPie').innerHTML = `
+      ${guia.paso ? '<button class="btn btn--txt" type="button" data-guia-volver>← Volver</button>' : ''}
+      ${fin ? '<button class="btn btn--txt" type="button" data-guia-reiniciar>Empezar de nuevo</button>' : ''}
+      ${fin && items.length ? `<button class="btn btn--ac" type="button" data-guia-sumar>Sumar todo · ${fmt(items.reduce((t, p) => t + p.precio, 0))}</button>` : ''}`;
+    $('#ovGuia .hoja__scroll').scrollTop = 0;
+  }
+
+  function abrirGuia() {
+    guia.paso = 0; guia.elegidas = [];
+    pintarGuia();
+    abrir($('#ovGuia'));
   }
 
   /* ---------- lista de precios para imprimir ---------- */
@@ -700,6 +769,7 @@
 
     // kits armados
     $('#combos').addEventListener('click', e => {
+      if (e.target.closest('[data-guia]')) return abrirGuia();
       const b = e.target.closest('[data-combo]'); if (!b) return;
       const c = combos.find(x => x.id === b.dataset.combo), items = comboItems(c);
       items.forEach(p => cambiarKit(p.id, 1));
@@ -711,7 +781,7 @@
     $('#ovProd').addEventListener('click', e => {
       const ver = e.target.closest('[data-ver]');
       if (ver) return abrirProducto(ver.dataset.ver);
-      if (e.target.closest('[data-compartir]')) return compartir(porId(fichaId));
+      if (e.target.closest('[data-compartir]')) return compartirProducto(porId(fichaId));
       const c = e.target.closest('[data-cant]');
       if (c) { fichaCant = Math.max(1, Math.min(99, fichaCant + Number(c.dataset.cant))); return pintarCompra(); }
       const ag = e.target.closest('[data-agregar]');
@@ -730,6 +800,17 @@
     $('#ovKit').addEventListener('click', e => {
       const k = e.target.closest('[data-kit]');
       if (k) return cambiarKit(k.closest('[data-id]').dataset.id, Number(k.dataset.kit));
+      if (e.target.closest('[data-compartir-kit]')) return compartirKit();
+      const pend = e.target.closest('[data-pend]');
+      if (pend) {
+        const pedido = estado.pendiente || {};
+        estado.pendiente = null;
+        if (pend.dataset.pend === 'reemplazar') estado.kit = pedido;
+        if (pend.dataset.pend === 'sumar') Object.entries(pedido).forEach(([id, n]) => { estado.kit[id] = Math.min(99, (estado.kit[id] || 0) + n); });
+        escribir(K_KIT, estado.kit);
+        pintarKit(); pintarGrilla();
+        return;
+      }
       if (e.target.closest('[data-vaciar]')) {
         estado.kit = {}; estado.nota = '';
         escribir(K_KIT, estado.kit); escribir(K_NOTA, '');
@@ -747,6 +828,23 @@
         if (t.dataset.dato === 'entrega') $('#kitDir').hidden = t.value !== 'envio';
       } else return;
       const a = $('#kitPie a'); if (a) a.href = linkWA(mensajeWA());
+    });
+
+    // asistente
+    $('#ovGuia').addEventListener('click', e => {
+      const pasos = rutinas[estado.mundo] || [];
+      const op = e.target.closest('[data-op]');
+      if (op) { guia.elegidas[guia.paso] = pasos[guia.paso].opciones[Number(op.dataset.op)]; guia.paso++; return pintarGuia(); }
+      if (e.target.closest('[data-guia-volver]')) { guia.paso--; guia.elegidas.length = guia.paso; return pintarGuia(); }
+      if (e.target.closest('[data-guia-reiniciar]')) { guia.paso = 0; guia.elegidas = []; return pintarGuia(); }
+      const sumar = e.target.closest('[data-guia-sumar]');
+      if (sumar) {
+        const items = guiaItems();
+        volar(sumar, items[0].color);
+        items.forEach(p => cambiarKit(p.id, 1));
+        toast(`Rutina sumada al kit: ${items.length} productos`);
+        cerrar();
+      }
     });
 
     // lista de precios: se arma justo antes de imprimir

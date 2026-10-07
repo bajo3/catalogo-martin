@@ -89,3 +89,42 @@ const COMBOS = [
   { id: "pileta-lista", mundo: "hogar", nombre: "Pileta lista", frase: "Agua transparente toda la temporada.",
     productos: ["Cloro Líquido para Pileta", "Alguicida para Pileta", "Clarificador para Pileta"] },
 ];
+
+/* Asistente "Armá tu rutina": unas pocas preguntas y arma la lista.
+   Cada opción suma productos (mismo formato que en los kits). */
+const RUTINAS = {
+  auto: [
+    { pregunta: "¿Qué le querés hacer al auto?", opciones: [
+      { texto: "Lavarlo bien", suma: ["Shampoo Neutro pH7", "Guante de Lavado Microfibra", "Microfibra de Secado 1200 GSM"] },
+      { texto: "Dejarlo brillante", suma: ["Snow Foam Rosa", "Shampoo Neutro pH7", "Cera Líquida Express", "Pack 3 Microfibras 350 GSM"] },
+      { texto: "Corregir rayas y proteger", suma: ["Iron Remover Descontaminante Férrico", "Clay Bar Media", "Pulidor One Step", "Pad de Espuma Finish 5\"", "Sellador Sintético"] },
+    ] },
+    { pregunta: "¿Y las llantas y cubiertas?", opciones: [
+      { texto: "Limpiarlas a fondo", suma: ["Limpia Llantas pH Neutro", "Cepillo para Llantas Cerdas Suaves", "Acondicionador de Cubiertas Brillo Húmedo"] },
+      { texto: "Solo cubiertas negras", suma: ["Acondicionador de Cubiertas Brillo Húmedo"] },
+      { texto: "No hace falta", suma: [] },
+    ] },
+    { pregunta: "¿Sumamos el interior?", opciones: [
+      { texto: "Limpieza completa", suma: ["APC Multipropósito", "Limpia Tapizados Espuma Activa", "Acondicionador de Plásticos Mate", "Limpiavidrios Sin Amoníaco"] },
+      { texto: "Solo vidrios y aroma", suma: ["Limpiavidrios Sin Amoníaco", "Aromatizante Auto Nuevo"] },
+      { texto: "No, solo por fuera", suma: [] },
+    ] },
+  ],
+  hogar: [
+    { pregunta: "¿Qué querés resolver primero?", opciones: [
+      { texto: "La limpieza de todos los días", suma: ["Detergente Concentrado Limón|5 L", "Lavandina Concentrada", "Desodorante de Pisos Lavanda", "Limpiador Multiuso Antibacterial"] },
+      { texto: "Una limpieza a fondo", suma: ["Desengrasante de Cocina", "Antisarro para Baños", "Quita Hongos y Moho", "Limpia Hornos en Gel", "Guantes de Látex"] },
+      { texto: "La ropa", suma: ["Jabón Líquido para Ropa", "Suavizante Concentrado", "Quitamanchas Prelavado"] },
+    ] },
+    { pregunta: "¿Qué pisos tenés?", opciones: [
+      { texto: "Cerámica o porcelanato", suma: ["Limpiador de Porcelanato", "Cera Autobrillo Incolora"] },
+      { texto: "Madera o flotante", suma: ["Limpiador de Pisos Flotantes"] },
+      { texto: "No necesito nada de pisos", suma: [] },
+    ] },
+    { pregunta: "¿Te faltan trapos o accesorios?", opciones: [
+      { texto: "Sí, lo básico", suma: ["Trapo de Piso Gris", "Rejillas de Cocina x3", "Esponjas Doble Faz x3"] },
+      { texto: "Quiero la mopa con balde", suma: ["Mopa con Balde Escurridor"] },
+      { texto: "Tengo todo", suma: [] },
+    ] },
+  ],
+};
