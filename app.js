@@ -549,6 +549,21 @@
     const info = $('.prod__info', ov); if (info) info.scrollTop = 0;
   }
 
+  /* ---------- lista de precios para imprimir ---------- */
+  function pintarLista() {
+    $('#imprimir').innerHTML = `
+      <header><h1>${esc(TIENDA.nombre)} ${esc(TIENDA.bajada)}</h1><p>Lista de precios · ${new Date().toLocaleDateString('es-AR')}</p></header>
+      ${MUNDOS.map(m => `<h2>${esc(m.nombre)}</h2>${CATEGORIAS.filter(c => ZON[c.zona].mundo === m.id).map(c => {
+        const l = P.filter(p => p.categoria === c.id);
+        return l.length ? `<h3>${esc(c.nombre)}</h3><table>${l.map(p => `<tr>
+          <td>${p.cod}</td>
+          <td>${esc(p.nombre)}${p.sinStock ? ' (sin stock)' : ''}</td>
+          <td>${esc(p.tamano)}</td>
+          <td>${fmt(p.precio)}</td></tr>`).join('')}</table>` : '';
+      }).join('')}`).join('')}
+      <footer>Precios sujetos a cambio sin previo aviso. Catálogo completo en ${esc(location.host + location.pathname)}</footer>`;
+  }
+
   /* =========================================================
      EVENTOS
      ========================================================= */
@@ -665,6 +680,18 @@
       escribir(K_NOTA, estado.nota);
       const a = $('#kitPie a'); if (a) a.href = linkWA(mensajeWA());
     });
+
+    // lista de precios: se arma justo antes de imprimir
+    addEventListener('beforeprint', pintarLista);
+    $('#btnLista').addEventListener('click', () => window.print());
+
+    // botón para volver a elegir zona, visible al bajar por el catálogo
+    const arriba = $('#btnArriba');
+    const catalogo = $('#catalogo');
+    addEventListener('scroll', () => {
+      arriba.classList.toggle('visible', scrollY > catalogo.offsetTop + innerHeight);
+    }, { passive: true });
+    arriba.addEventListener('click', () => $('#mapa').scrollIntoView({ behavior: 'smooth' }));
 
     // cerrar hojas
     document.addEventListener('click', e => { if (e.target.closest('[data-cerrar]')) cerrar(); });
