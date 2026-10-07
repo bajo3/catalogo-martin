@@ -6,6 +6,11 @@
 <meta name="theme-color" content="#08090b">
 <title>Martín Auto y Hogar — Catálogo de limpieza para el auto y el hogar</title>
 <meta name="description" content="Catálogo interactivo de productos de limpieza para el auto y el hogar. Elegí qué querés limpiar, armá tu kit y pedilo por WhatsApp.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Martín Auto y Hogar — Catálogo de limpieza">
+<meta property="og:description" content="Productos de limpieza para el auto y la casa. Elegí qué querés limpiar, armá tu kit y pedilo por WhatsApp.">
+<meta property="og:url" content="https://catalogo-martin.vercel.app/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2308090b'/%3E%3Cpath d='M32 10C22 24 16 32 16 40a16 16 0 0 0 32 0c0-8-6-16-16-30z' fill='%23ff5a1f'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -288,6 +293,8 @@
       <p class="catalogo__cuenta" id="catCuenta" aria-live="polite"></p>
     </div>
 
+    <div class="combos" id="combos" hidden></div>
+
     <div class="barra" id="barra">
       <div class="barra__fila">
         <label class="buscar">
@@ -326,10 +333,6 @@
 <footer class="pie">
   <p><b data-tienda="nombre">MARTÍN</b> <span data-tienda="bajada">Car Care</span> · <span data-tienda="ciudad">Buenos Aires</span></p>
   <p class="pie__nota">Demo de catálogo. Precios y productos de ejemplo.</p>
-  <button class="pie__carga" type="button" id="btnCarga">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-    Cargar productos
-  </button>
 </footer>
 
 <!-- Barra flotante del kit -->

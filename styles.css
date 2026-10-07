@@ -390,6 +390,33 @@ a { color: inherit; -webkit-tap-highlight-color: transparent; }
 .chip[aria-pressed="true"] { background: var(--tx); border-color: var(--tx); color: #0a0b0e; font-weight: 600; }
 .chip[aria-pressed="true"] b { color: #0a0b0e; }
 
+/* ---------- kits armados ---------- */
+.combos { margin-top: 22px; }
+.combos__tit { display: flex; align-items: baseline; gap: 10px; font: 800 26px/1 var(--fd); text-transform: uppercase; letter-spacing: .01em; }
+.combos__tit span { font: 500 11px/1.2 var(--fm); letter-spacing: .08em; color: var(--mu); }
+.combos__fila {
+  display: flex; gap: 10px; overflow-x: auto;
+  margin: 12px -16px 0; padding: 0 16px 6px;
+  scrollbar-width: none; scroll-snap-type: x mandatory;
+}
+.combos__fila::-webkit-scrollbar { display: none; }
+.combo {
+  --c: var(--ac);
+  flex: none; width: min(78vw, 290px); scroll-snap-align: center;
+  display: flex; flex-direction: column;
+  padding: 14px; border: 1px solid var(--ln); border-radius: var(--r);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--c) 22%, var(--p1)) 0%, var(--p1) 60%);
+}
+.combo__img { display: flex; height: 84px; margin-bottom: 10px; }
+.combo__img span { display: contents; }
+.combo__img svg, .combo__img img { height: 100%; width: auto; margin-right: -14px; object-fit: contain; filter: drop-shadow(0 8px 8px rgba(0, 0, 0, .45)); }
+.combo h4 { margin: 0; font: 900 28px/.95 var(--fd); text-transform: uppercase; }
+.combo p { margin: 6px 0 10px; font-size: 14px; line-height: 1.35; color: #cfcbc2; }
+.combo ul { flex: 1; margin: 0 0 14px; padding: 0; list-style: none; display: grid; gap: 5px; align-content: start; }
+.combo li { display: flex; gap: 8px; font-size: 13px; line-height: 1.25; color: var(--mu); }
+.combo li::before { content: ""; flex: none; width: 6px; height: 6px; margin-top: 5px; border-radius: 50%; background: var(--c); }
+.combo .btn { width: 100%; }
+
 /* ---------- grilla y tarjetas ---------- */
 .grid {
   display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -482,14 +509,6 @@ a { color: inherit; -webkit-tap-highlight-color: transparent; }
 }
 .pie b { font: 800 18px/1 var(--fd); color: var(--tx); letter-spacing: .03em; }
 .pie__nota { font: 400 11px/1.4 var(--fm); letter-spacing: .06em; text-transform: uppercase; }
-.pie__carga {
-  display: inline-flex; align-items: center; gap: 8px;
-  height: 46px; margin-top: 10px; padding: 0 16px 0 12px;
-  border: 1px dashed rgba(255, 255, 255, .3); border-radius: 12px;
-  color: var(--tx); font: 500 14px/1 var(--fb);
-}
-.pie__carga svg { width: 18px; height: 18px; fill: none; stroke: var(--ac); stroke-width: 2.4; stroke-linecap: round; }
-
 /* ---------- barra del kit ---------- */
 .kitbar {
   position: fixed; z-index: 40; left: 12px; right: 12px;
@@ -590,6 +609,8 @@ a { color: inherit; -webkit-tap-highlight-color: transparent; }
 .uso { margin-top: 20px; padding: 14px 16px; border-radius: 14px; background: var(--p2); border-left: 3px solid var(--c); }
 .uso b { display: block; margin-bottom: 4px; font: 500 11px/1 var(--fm); letter-spacing: .12em; text-transform: uppercase; color: var(--mu); }
 .uso p { font-size: 15px; line-height: 1.45; }
+.prod__acc { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.prod__acc svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .rel { margin-top: 26px; }
 .rel h3 { font: 800 22px/1 var(--fd); text-transform: uppercase; letter-spacing: .02em; }
 .rel__fila { display: flex; gap: 8px; overflow-x: auto; margin: 12px -18px 0; padding: 0 18px 4px; scrollbar-width: none; }
@@ -719,6 +740,8 @@ a { color: inherit; -webkit-tap-highlight-color: transparent; }
   .card--dest .card__img { height: 210px; }
   .card--dest .card__nom { font-size: 40px; }
   .pildoras, .chips { margin-inline: 0; padding-inline: 0; flex-wrap: wrap; }
+  .combos__fila { margin-inline: 0; padding-inline: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; overflow: visible; }
+  .combo { width: auto; }
   .punto span { display: block; }
   .punto:hover span { opacity: 1; transform: translate(-50%, 0); background: var(--tx); }
   .punto[aria-pressed="true"]:hover span { background: var(--zc); }
@@ -765,6 +788,7 @@ a { color: inherit; -webkit-tap-highlight-color: transparent; }
 
 @media (min-width: 1080px) {
   .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .combos__fila { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .auto { padding-top: 54px; }
 }
 

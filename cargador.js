@@ -284,6 +284,12 @@
     limpiarForm(); estado(); pintarLista(); pestana('nuevo');
     C.abrir(ov);
   }
-  $('#btnCarga').addEventListener('click', abrirPanel);
-  if (location.hash === '#cargar') abrirPanel();
+  // el panel no tiene botón a la vista: se entra agregando #cargar a la dirección
+  function porDireccion() {
+    if (location.hash !== '#cargar') return;
+    history.replaceState(null, '', location.pathname + location.search);
+    abrirPanel();
+  }
+  addEventListener('hashchange', porDireccion);
+  porDireccion();
 })();

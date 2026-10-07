@@ -57,3 +57,26 @@ const CATEGORIAS = [
   { id: "patio",          nombre: "Patio y pileta",      zona: "patio",      pref: "PP", color: "#3fe08a" },
   { id: "utiles",         nombre: "Trapos y accesorios", zona: "utiles",     pref: "UT", color: "#d9f24a" },
 ];
+
+/* Kits armados: se suman al pedido con un toque. En "productos" va el
+   nombre exacto del producto; si hay dos con el mismo nombre, agregá
+   el tamaño después de una barra:  "Detergente Concentrado Limón|5 L" */
+const COMBOS = [
+  { id: "lavado-basico", mundo: "auto", nombre: "Lavado básico", frase: "Lo justo para lavar bien y sin rayar.",
+    productos: ["Shampoo Neutro pH7", "Guante de Lavado Microfibra", "Microfibra de Secado 1200 GSM", "Balde con Rejilla 20 L"] },
+  { id: "brillo-finde", mundo: "auto", nombre: "Brillo de fin de semana", frase: "Espuma, cera rápida y cubiertas negras.",
+    productos: ["Snow Foam Rosa", "Shampoo con Cera", "Quick Detailer", "Acondicionador de Cubiertas Brillo Húmedo", "Pack 3 Microfibras 350 GSM"] },
+  { id: "detailing-completo", mundo: "auto", nombre: "Detailing completo", frase: "Descontaminar, pulir y proteger la pintura.",
+    productos: ["Iron Remover Descontaminante Férrico", "Clay Bar Media", "Pulidor One Step", "Pad de Espuma Finish 5\"", "Sellador Sintético", "Cera Carnauba en Pasta"] },
+  { id: "interior-impecable", mundo: "auto", nombre: "Interior impecable", frase: "Tapizados, plásticos y vidrios por dentro.",
+    productos: ["APC Multipropósito", "Limpia Tapizados Espuma Activa", "Acondicionador de Plásticos Mate", "Limpiavidrios Sin Amoníaco", "Aromatizante Auto Nuevo"] },
+
+  { id: "casa-al-dia", mundo: "hogar", nombre: "Casa al día", frase: "Lo que se usa todas las semanas.",
+    productos: ["Detergente Concentrado Limón|5 L", "Lavandina Concentrada", "Desodorante de Pisos Lavanda", "Trapo de Piso Gris", "Rejillas de Cocina x3"] },
+  { id: "bano-a-fondo", mundo: "hogar", nombre: "Baño a fondo", frase: "Sarro, hongos e inodoro de una pasada.",
+    productos: ["Gel Sanitario para Inodoros", "Antisarro para Baños", "Quita Hongos y Moho", "Guantes de Látex", "Esponjas Doble Faz x3"] },
+  { id: "lavadero-completo", mundo: "hogar", nombre: "Lavadero completo", frase: "Lavar, suavizar y sacar manchas.",
+    productos: ["Jabón Líquido para Ropa", "Suavizante Concentrado", "Quitamanchas Prelavado"] },
+  { id: "pileta-lista", mundo: "hogar", nombre: "Pileta lista", frase: "Agua transparente toda la temporada.",
+    productos: ["Cloro Líquido para Pileta", "Alguicida para Pileta", "Clarificador para Pileta"] },
+];

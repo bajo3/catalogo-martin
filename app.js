@@ -261,7 +261,31 @@
     </article>`;
   }
 
+  /* ---------- kits armados ---------- */
+  const combos = typeof COMBOS === 'undefined' ? [] : COMBOS;
+  const comboItems = c => c.productos.map(ref => {
+    const [nom, tam] = ref.split('|').map(x => plano(x).trim());
+    return P.find(p => plano(p.nombre) === nom && (!tam || plano(p.tamano) === tam));
+  }).filter(Boolean);
+
+  function pintarCombos() {
+    const caja = $('#combos');
+    const ver = !estado.q && estado.zona === 'todo' && estado.cat === 'todo';
+    const lista = ver ? combos.filter(c => c.mundo === estado.mundo).map(c => ({ c, items: comboItems(c) })).filter(x => x.items.length > 1) : [];
+    caja.hidden = !lista.length;
+    caja.innerHTML = lista.length ? `<h3 class="combos__tit">Kits armados <span>Un toque y sumás todo</span></h3>
+      <div class="combos__fila">${lista.map(({ c, items }) => `
+        <article class="combo" style="--c:${items[0].color}">
+          <div class="combo__img" aria-hidden="true">${items.slice(0, 4).map(p => `<span style="--c:${p.color}">${visual(p)}</span>`).join('')}</div>
+          <h4>${esc(c.nombre)}</h4>
+          <p>${esc(c.frase)}</p>
+          <ul>${items.map(p => `<li>${esc(p.nombre)}</li>`).join('')}</ul>
+          <button class="btn btn--ac btn--ch" type="button" data-combo="${esc(c.id)}">Sumar kit · ${fmt(items.reduce((t, p) => t + p.precio, 0))}</button>
+        </article>`).join('')}</div>` : '';
+  }
+
   function pintarGrilla() {
+    pintarCombos();
     const l = filtrar(), grid = $('#grid');
     const z = zonaInfo(estado.zona);
     $('#catTitulo').textContent = estado.q ? 'Resultados' : estado.cat !== 'todo' ? CAT[estado.cat].nombre : z.nombre;
@@ -428,6 +452,35 @@
       <button class="btn btn--ac" type="button" data-agregar>Agregar</button>`;
   }
 
+  /* ---------- link propio de cada producto y compartir ---------- */
+  const linkProducto = p => `${location.origin}${location.pathname}?p=${encodeURIComponent(p.id)}`;
+
+  async function compartir(p) {
+    const datos = {
+      title: `${p.nombre} — ${TIENDA.nombre} ${TIENDA.bajada}`,
+      text: `${p.nombre}${p.tamano ? ` (${p.tamano})` : ''} · ${fmt(p.precio)}`,
+      url: linkProducto(p),
+    };
+    try {
+      if (navigator.share) return await navigator.share(datos);
+      await navigator.clipboard.writeText(datos.url);
+      toast('Link copiado');
+    } catch (e) {
+      if (e.name !== 'AbortError') toast('No se pudo compartir el link');
+    }
+  }
+
+  // si entran con el link de un producto, se abre su ficha
+  function abrirDesdeLink() {
+    const id = new URLSearchParams(location.search).get('p');
+    if (!id) return;
+    history.replaceState(null, '', location.pathname);
+    const p = porId(id);
+    if (!p) return;
+    elegirMundo(mundoDe(p));
+    abrirProducto(id);
+  }
+
   function abrirProducto(id) {
     const p = porId(id); if (!p) return;
     const c = CAT[p.categoria], z = ZON[c.zona];
@@ -451,11 +504,18 @@
         ${p.descripcion ? `<p class="prod__desc">${esc(p.descripcion)}</p>` : ''}
         ${p.tags.length ? `<ul class="tags">${p.tags.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
         ${p.uso ? `<div class="uso"><b>Cómo se usa</b><p>${esc(p.uso)}</p></div>` : ''}
+        <div class="prod__acc">
+          <button class="btn btn--linea btn--ch" type="button" data-compartir>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M8 8l4-4 4 4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>Compartir
+          </button>
+          <a class="btn btn--linea btn--ch" target="_blank" rel="noopener" href="${esc(linkWA(`¡Hola! Quiero consultar por ${p.nombre}${p.tamano ? ` (${p.tamano})` : ''} — ${fmt(p.precio)}\n${linkProducto(p)}`))}">Consultar por WhatsApp</a>
+        </div>
         ${rel.items.length ? `<div class="rel"><h3>${esc(rel.titulo)}</h3><div class="rel__fila">${rel.items.map(r =>
           `<button class="mini" type="button" data-ver="${esc(r.id)}" style="--c:${r.color}">${visual(r)}<b>${esc(r.nombre)}</b><span>${fmt(r.precio)}</span></button>`).join('')}</div></div>` : ''}
       </div>`;
     pintarCompra();
     abrir(ov);
+    history.replaceState({ hoja: true }, '', `?p=${encodeURIComponent(id)}`);
     $('#prodCuerpo').scrollTop = 0;
     const info = $('.prod__info', ov); if (info) info.scrollTop = 0;
   }
@@ -512,10 +572,20 @@
       } else abrirProducto(id);
     });
 
+    // kits armados
+    $('#combos').addEventListener('click', e => {
+      const b = e.target.closest('[data-combo]'); if (!b) return;
+      const c = combos.find(x => x.id === b.dataset.combo), items = comboItems(c);
+      items.forEach(p => cambiarKit(p.id, 1));
+      volar(b, items[0].color);
+      toast(`Kit “${c.nombre}” sumado: ${items.length} productos`);
+    });
+
     // ficha
     $('#ovProd').addEventListener('click', e => {
       const ver = e.target.closest('[data-ver]');
       if (ver) return abrirProducto(ver.dataset.ver);
+      if (e.target.closest('[data-compartir]')) return compartir(porId(fichaId));
       const c = e.target.closest('[data-cant]');
       if (c) { fichaCant = Math.max(1, Math.min(99, fichaCant + Number(c.dataset.cant))); return pintarCompra(); }
       const ag = e.target.closest('[data-agregar]');
@@ -587,4 +657,5 @@
   marca();
   eventos();
   recargar();
+  abrirDesdeLink();
 })();
