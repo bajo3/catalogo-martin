@@ -15,6 +15,8 @@
    uso:         cómo se aplica
    tags:        hasta 3 datos cortos, ej. ["pH neutro", "Dil. 1:200"]
    destacado:   true para que salga grande
+   precioAntes: precio anterior; si es mayor al precio, se muestra como oferta
+   sinStock:    true para mostrarlo como "Sin stock" (no se puede pedir)
    envase:      dibujo del producto si no hay foto:
                 gatillo | botella | bidon | pote | gotero | aerosol |
                 pano | guante | cepillo | balde | pad | barra | esponja
@@ -30,7 +32,7 @@ const PRODUCTOS = [
     descripcion: "Shampoo de alta lubricación que no se lleva puesta la cera ni el sellador. Mucha espuma y enjuague fácil.",
     uso: "Diluí 1 tapa cada 5 L de agua. Lavá de arriba hacia abajo con guante de microfibra y enjuagá a la sombra.",
     tags: ["pH neutro", "Dil. 1:200", "No saca cera"] },
-  { nombre: "Snow Foam Rosa", categoria: "lavado", precio: 16500, tamano: "1 L", envase: "botella", destacado: true,
+  { nombre: "Snow Foam Rosa", categoria: "lavado", precio: 16500, precioAntes: 19900, tamano: "1 L", envase: "botella", destacado: true,
     descripcion: "Espuma activa bien densa para el prelavado. Ablanda la mugre antes de tocar la pintura y evita rayones.",
     uso: "Cargá el foam lance 1:10, cubrí el auto seco, dejá actuar 5 minutos sin que se seque y enjuagá a presión.",
     tags: ["Prelavado", "Dil. 1:10", "Foam lance"] },
@@ -98,7 +100,7 @@ const PRODUCTOS = [
     descripcion: "Espuma ultra blanda para lustre final y aplicación de selladores.",
     uso: "Usalo a baja velocidad y lavalo con agua tibia después de cada uso.",
     tags: ["5 pulgadas", "Espuma blanda"] },
-  { nombre: "Pad de Lana 5\"", categoria: "pulido", precio: 14200, tamano: "1 u", envase: "pad", color: "#efe6cf",
+  { nombre: "Pad de Lana 5\"", categoria: "pulido", precio: 14200, sinStock: true, tamano: "1 u", envase: "pad", color: "#efe6cf",
     descripcion: "Lana natural trenzada para el máximo poder de corte en lacas duras.",
     uso: "Con compuesto de corte pesado. Limpiá las fibras con aire entre pasadas.",
     tags: ["Corte máximo", "Lana natural"] },
@@ -116,7 +118,7 @@ const PRODUCTOS = [
     descripcion: "Recubrimiento cerámico de alta dureza. Brillo espejo, hidrofobia extrema y resistencia química.",
     uso: "Sobre pintura pulida y desengrasada. Aplicá en cruz con el taco, nivelá al minuto con microfibra.",
     tags: ["Dura 2 años", "Dureza 9H", "Alcanza 1 auto"] },
-  { nombre: "Quick Detailer", categoria: "proteccion", precio: 11200, tamano: "500 ml", envase: "gatillo",
+  { nombre: "Quick Detailer", categoria: "proteccion", precio: 11200, precioAntes: 13500, tamano: "500 ml", envase: "gatillo",
     descripcion: "Repaso rápido entre lavados: saca polvo y huellas y levanta el brillo en un minuto.",
     uso: "Rociá, pasá microfibra y lustrá con el lado seco.",
     tags: ["Uso diario", "Listo para usar"] },
@@ -138,7 +140,7 @@ const PRODUCTOS = [
     tags: ["Filtro UV", "Alcanza 6 ópticas"] },
 
   // ---------- LLANTAS Y CUBIERTAS ----------
-  { nombre: "Limpia Llantas pH Neutro", categoria: "llantas", precio: 15600, tamano: "500 ml", envase: "gatillo", destacado: true,
+  { nombre: "Limpia Llantas pH Neutro", categoria: "llantas", precio: 15600, precioAntes: 18400, tamano: "500 ml", envase: "gatillo", destacado: true,
     descripcion: "Disuelve polvo de freno y grasa sin ácidos. Seguro en llantas pulidas, diamantadas y pintadas.",
     uso: "Rociá con la llanta fría, cepillá, dejá actuar 3 minutos y enjuagá.",
     tags: ["Sin ácido", "Polvo de freno"] },
@@ -226,7 +228,7 @@ const PRODUCTOS = [
     tags: ["Uso profesional", "Dil. hasta 1:20"] },
 
   // ---------- ACCESORIOS ----------
-  { nombre: "Microfibra de Secado 1200 GSM", categoria: "accesorios", precio: 21900, tamano: "60 × 90 cm", envase: "pano", destacado: true,
+  { nombre: "Microfibra de Secado 1200 GSM", categoria: "accesorios", precio: 21900, precioAntes: 25900, tamano: "60 × 90 cm", envase: "pano", destacado: true,
     descripcion: "Seca un auto mediano de una pasada. Doble felpa, sin bordes que rayen.",
     uso: "Apoyala y arrastrala sin presión. Lavala sin suavizante.",
     tags: ["1200 GSM", "Sin bordes"] },
@@ -272,7 +274,7 @@ const PRODUCTOS = [
     tags: ["40 lavados", "Sin velo"] },
 
   // ---------- BAÑO ----------
-  { nombre: "Lavandina Concentrada", categoria: "bano", precio: 4900, tamano: "5 L", envase: "bidon", destacado: true,
+  { nombre: "Lavandina Concentrada", categoria: "bano", precio: 4900, precioAntes: 5900, tamano: "5 L", envase: "bidon", destacado: true,
     descripcion: "Desinfecta y blanquea baños, pisos y ropa blanca. Concentrada: se diluye y rinde mucho más.",
     uso: "Media taza en 5 L de agua para pisos y baños. Nunca la mezcles con otros productos.",
     tags: ["55 g Cl/L", "Desinfecta"] },
@@ -302,7 +304,7 @@ const PRODUCTOS = [
     descripcion: "Limpia, desinfecta y deja la casa perfumada por horas. El clásico que se lleva por bidón.",
     uso: "Dos tapas en medio balde de agua. No necesita enjuague.",
     tags: ["Perfume duradero", "No enjuaga"] },
-  { nombre: "Desodorante de Pisos Marina", categoria: "pisos", precio: 5900, tamano: "5 L", envase: "bidon", color: "#45d4ff",
+  { nombre: "Desodorante de Pisos Marina", categoria: "pisos", precio: 5900, precioAntes: 6900, tamano: "5 L", envase: "bidon", color: "#45d4ff",
     descripcion: "La misma fórmula con fragancia fresca tipo brisa de mar.",
     uso: "Dos tapas en medio balde de agua. No necesita enjuague.",
     tags: ["Perfume duradero", "No enjuaga"] },
@@ -332,13 +334,13 @@ const PRODUCTOS = [
     descripcion: "Para mesas, picaportes, heladera por fuera y cualquier superficie lavable.",
     uso: "Rociá y pasá un paño. No necesita enjuague.",
     tags: ["Antibacterial", "Toda la casa"] },
-  { nombre: "Perfumina Textil", categoria: "muebles", precio: 4800, tamano: "500 ml", envase: "gatillo", color: "#ff5fa8",
+  { nombre: "Perfumina Textil", categoria: "muebles", precio: 4800, sinStock: true, tamano: "500 ml", envase: "gatillo", color: "#ff5fa8",
     descripcion: "Perfume para sillones, cortinas, sábanas y ambientes. No mancha.",
     uso: "Rociá a 30 cm de la tela. Dura varios días.",
     tags: ["No mancha", "Telas y ambientes"] },
 
   // ---------- ROPA ----------
-  { nombre: "Jabón Líquido para Ropa", categoria: "ropa", precio: 11900, tamano: "5 L", envase: "bidon", destacado: true,
+  { nombre: "Jabón Líquido para Ropa", categoria: "ropa", precio: 11900, precioAntes: 13900, tamano: "5 L", envase: "bidon", destacado: true,
     descripcion: "Para lavarropas automático y lavado a mano. Cuida los colores y saca manchas con agua fría.",
     uso: "Una tapa por carga normal, una y media si la ropa está muy sucia.",
     tags: ["50 lavados", "Baja espuma"] },
@@ -378,7 +380,7 @@ const PRODUCTOS = [
     tags: ["Grasa quemada", "Hierro y acero"] },
 
   // ---------- TRAPOS Y ACCESORIOS ----------
-  { nombre: "Mopa con Balde Escurridor", categoria: "utiles", precio: 18900, tamano: "12 L", envase: "balde", destacado: true, color: "#45d4ff",
+  { nombre: "Mopa con Balde Escurridor", categoria: "utiles", precio: 18900, precioAntes: 22900, tamano: "12 L", envase: "balde", destacado: true, color: "#45d4ff",
     descripcion: "Balde con escurridor a pedal y mopa de microfibra giratoria. Se limpia sin agacharse ni mojarse las manos.",
     uso: "Mojá, escurrí con el pedal y pasá. El cabezal se lava en el lavarropas.",
     tags: ["Escurre a pedal", "Repuesto lavable"] },

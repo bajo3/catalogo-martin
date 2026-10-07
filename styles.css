@@ -390,6 +390,22 @@ a { color: inherit; -webkit-tap-highlight-color: transparent; }
 .chip[aria-pressed="true"] { background: var(--tx); border-color: var(--tx); color: #0a0b0e; font-weight: 600; }
 .chip[aria-pressed="true"] b { color: #0a0b0e; }
 
+.catalogo__lado { display: flex; align-items: center; gap: 12px; padding-bottom: 6px; }
+.catalogo__lado .catalogo__cuenta { padding-bottom: 0; }
+.ofertas {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 36px; padding: 0 12px;
+  border: 1px solid var(--ac); border-radius: 999px; color: var(--ac);
+  font: 500 12px/1 var(--fm); letter-spacing: .08em; text-transform: uppercase;
+  transition: background .2s, color .2s;
+}
+.ofertas i { font-style: normal; opacity: .75; }
+.ofertas[aria-pressed="true"] { background: var(--ac); color: #0a0b0e; }
+.sugeridos { display: flex; align-items: center; gap: 6px; overflow-x: auto; margin: 8px -16px 0; padding: 0 16px 2px; scrollbar-width: none; }
+.sugeridos::-webkit-scrollbar { display: none; }
+.sugeridos span { flex: none; font: 500 11px/1 var(--fm); letter-spacing: .08em; text-transform: uppercase; color: var(--mu); }
+.sugeridos button { flex: none; height: 36px; padding: 0 12px; border-radius: 999px; background: var(--p2); font-size: 14px; }
+
 /* ---------- kits armados ---------- */
 .combos { margin-top: 22px; }
 .combos__tit { display: flex; align-items: baseline; gap: 10px; font: 800 26px/1 var(--fd); text-transform: uppercase; letter-spacing: .01em; }
@@ -480,6 +496,11 @@ a { color: inherit; -webkit-tap-highlight-color: transparent; }
   .card:hover .card__img svg, .card:hover .card__img img { transform: translateY(-6px) rotate(-5deg) scale(1.04); }
   .card__mas:hover { transform: scale(1.1); }
 }
+.card__precio s { margin-right: 6px; font-size: .78em; color: var(--mu); }
+.card__sello--oferta { background: var(--tx); font-size: 11px; transform: rotate(-3deg); }
+.card__sello--gris { background: #3a3f48; color: #cfcbc2; transform: none; }
+.card--agotado .card__img { opacity: .38; filter: grayscale(1); }
+.card--agotado .card__precio, .card--agotado .card__nom { color: var(--mu); }
 /* destacados: fila completa en horizontal */
 .card--dest { grid-column: span 2; background: linear-gradient(100deg, color-mix(in srgb, var(--c) 30%, var(--p1)) 0%, var(--p1) 62%); }
 .card--dest .card__abrir { display: grid; grid-template-columns: 40% 1fr; grid-template-rows: auto 1fr; column-gap: 12px; }
@@ -633,6 +654,7 @@ a { color: inherit; -webkit-tap-highlight-color: transparent; }
 .compra__precio { display: grid; gap: 3px; margin-right: auto; }
 .compra__precio small { font: 500 10px/1 var(--fm); letter-spacing: .1em; text-transform: uppercase; color: var(--mu); }
 .compra__precio b { font: 500 20px/1 var(--fm); }
+.compra__precio s { margin-right: 6px; font-size: .7em; color: var(--mu); }
 .cant { display: flex; align-items: center; height: 48px; border: 1px solid var(--ln); border-radius: 999px; }
 .cant button { width: 42px; height: 46px; font: 500 20px/1 var(--fm); }
 .cant output { min-width: 20px; text-align: center; font: 500 15px/1 var(--fm); }
@@ -651,6 +673,13 @@ a { color: inherit; -webkit-tap-highlight-color: transparent; }
 .kit__item span { display: block; margin-top: 5px; font: 500 12px/1 var(--fm); color: var(--mu); }
 .kit__item .cant { height: 40px; }
 .kit__item .cant button { width: 36px; height: 38px; }
+.kit__nota { display: grid; gap: 6px; margin: 4px 18px 16px; font: 500 11px/1.2 var(--fm); letter-spacing: .08em; text-transform: uppercase; color: var(--mu); }
+.kit__nota textarea {
+  width: 100%; padding: 12px 14px; resize: vertical;
+  background: var(--p2); border: 1px solid var(--ln); border-radius: 12px; outline: 0;
+  font: 400 16px/1.35 var(--fb); letter-spacing: 0; text-transform: none; color: var(--tx);
+}
+.kit__nota textarea:focus { border-color: var(--ac); }
 .kit__vacio { padding: 30px 18px 46px; text-align: center; color: var(--mu); }
 .kit__vacio b { display: block; margin-bottom: 6px; font: 800 30px/1 var(--fd); text-transform: uppercase; color: var(--tx); }
 .compra--kit { flex-wrap: wrap; }
@@ -740,6 +769,7 @@ a { color: inherit; -webkit-tap-highlight-color: transparent; }
   .card--dest .card__img { height: 210px; }
   .card--dest .card__nom { font-size: 40px; }
   .pildoras, .chips { margin-inline: 0; padding-inline: 0; flex-wrap: wrap; }
+  .sugeridos { margin-inline: 0; padding-inline: 0; }
   .combos__fila { margin-inline: 0; padding-inline: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; overflow: visible; }
   .combo { width: auto; }
   .punto span { display: block; }

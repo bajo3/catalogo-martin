@@ -10,6 +10,10 @@
 <meta property="og:title" content="Martín Auto y Hogar — Catálogo de limpieza">
 <meta property="og:description" content="Productos de limpieza para el auto y la casa. Elegí qué querés limpiar, armá tu kit y pedilo por WhatsApp.">
 <meta property="og:url" content="https://catalogo-martin.vercel.app/">
+<meta property="og:image" content="https://catalogo-martin.vercel.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2308090b'/%3E%3Cpath d='M32 10C22 24 16 32 16 40a16 16 0 0 0 32 0c0-8-6-16-16-30z' fill='%23ff5a1f'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -290,7 +294,10 @@
     <p class="kicker">02 — Elegí el producto</p>
     <div class="catalogo__cab">
       <h2 id="catTitulo">Todo el auto</h2>
-      <p class="catalogo__cuenta" id="catCuenta" aria-live="polite"></p>
+      <div class="catalogo__lado">
+        <p class="catalogo__cuenta" id="catCuenta" aria-live="polite"></p>
+        <button class="ofertas" id="btnOfertas" type="button" aria-pressed="false" hidden>Ofertas <i></i></button>
+      </div>
     </div>
 
     <div class="combos" id="combos" hidden></div>
@@ -312,6 +319,7 @@
           </select>
         </label>
       </div>
+      <div class="sugeridos" id="sugeridos" hidden></div>
       <div class="chips" id="chips" role="group" aria-label="Etapas"></div>
     </div>
 
@@ -411,10 +419,13 @@
         <label class="campo">Precio *
           <input name="precio" required inputmode="numeric" placeholder="13900">
         </label>
+        <label class="campo">Precio anterior
+          <input name="precioAntes" inputmode="numeric" placeholder="Solo si está en oferta">
+        </label>
         <label class="campo">Tamaño
           <input name="tamano" maxlength="24" placeholder="500 ml">
         </label>
-        <label class="campo">Envase (dibujo)
+        <label class="campo campo--ancho">Envase (dibujo)
           <select name="envase" id="fEnv"></select>
         </label>
         <label class="campo campo--ancho">Descripción
@@ -434,6 +445,7 @@
           </div>
         </div>
         <label class="check campo--ancho"><input type="checkbox" name="destacado"> Destacado (sale en grande)</label>
+        <label class="check campo--ancho"><input type="checkbox" name="sinStock"> Sin stock (se muestra, pero no se puede pedir)</label>
 
         <p class="form__error campo--ancho" id="fError" role="alert" hidden></p>
         <div class="form__acc campo--ancho">

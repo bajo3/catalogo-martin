@@ -77,6 +77,9 @@
     if (uso) p.uso = uso;
     if (tags.length) p.tags = tags;
     if (d.get('destacado')) p.destacado = true;
+    const antes = aPrecio(d.get('precioAntes'));
+    if (antes > p.precio) p.precioAntes = antes;
+    if (d.get('sinStock')) p.sinStock = true;
     if (foto) p.foto = foto;
     return p;
   }
@@ -113,6 +116,8 @@
     f.uso.value = p.uso || '';
     f.tags.value = (p.tags || []).join(', ');
     f.destacado.checked = !!p.destacado;
+    f.precioAntes.value = p.precioAntes || '';
+    f.sinStock.checked = !!p.sinStock;
     $('#fModo').textContent = 'Editando producto';
     $('#fGuardar').textContent = 'Guardar cambios';
     $('#fCancelar').hidden = false;
@@ -222,7 +227,7 @@
     $('#lLista').innerHTML = filas.length ? filas.map(({ p, i }) => `
       <li style="--c:${colorDe(p)}" data-i="${i}">
         ${dibujo(p)}
-        <div><b>${esc(p.nombre)}</b><span>${esc((CAT[p.categoria] || CAT.accesorios).nombre)} · ${fmt(p.precio)}${p.destacado ? ' · Destacado' : ''}</span></div>
+        <div><b>${esc(p.nombre)}</b><span>${esc((CAT[p.categoria] || CAT.accesorios).nombre)} · ${fmt(p.precio)}${p.destacado ? ' · Destacado' : ''}${p.precioAntes > p.precio ? ' · Oferta' : ''}${p.sinStock ? ' · Sin stock' : ''}</span></div>
         <button type="button" data-editar>Editar</button>
         <button type="button" class="borrar" data-borrar>Borrar</button>
       </li>`).join('') : '<li style="grid-template-columns:1fr"><span>No hay productos con ese nombre.</span></li>';

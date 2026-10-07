@@ -11,12 +11,15 @@ const TIENDA = {
 };
 
 /* Los dos mundos del catálogo. "accesorios" es la categoría que se
-   sugiere en la ficha cuando no hay una etapa siguiente. */
+   sugiere en la ficha cuando no hay una etapa siguiente y "busquedas"
+   son las palabras que se proponen al tocar el buscador. */
 const MUNDOS = [
   { id: "auto",  nombre: "Auto",  titulo: "Todo el auto", frase: "Del lavado al encerado, de punta a punta.",
-    color: "#ff5a1f", rotulo: "Fiat Cronos · hecho en Córdoba", accesorios: "accesorios" },
+    color: "#ff5a1f", rotulo: "Fiat Cronos · hecho en Córdoba", accesorios: "accesorios",
+    busquedas: ["cera", "shampoo", "llantas", "microfibra", "vidrios"] },
   { id: "hogar", nombre: "Hogar", titulo: "Toda la casa", frase: "De la cocina al patio, ambiente por ambiente.",
-    color: "#ff5a1f", rotulo: "La casa · ambiente por ambiente", accesorios: "utiles" },
+    color: "#ff5a1f", rotulo: "La casa · ambiente por ambiente", accesorios: "utiles",
+    busquedas: ["lavandina", "detergente", "pisos", "ropa", "pileta"] },
 ];
 
 /* Zonas (los puntos que se tocan en el dibujo del auto o de la casa). */

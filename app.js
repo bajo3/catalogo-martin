@@ -18,10 +18,11 @@
   /* ---------- guardado local (no hay base de datos) ---------- */
   const K_PROD = 'martin.productos';
   const K_KIT = 'martin.kit';
+  const K_NOTA = 'martin.nota';
   const leer = (k, def) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } };
   const escribir = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } };
 
-  const estado = { mundo: MUNDOS[0].id, zona: 'todo', cat: 'todo', q: '', orden: 'rel', kit: leer(K_KIT, {}) };
+  const estado = { mundo: MUNDOS[0].id, zona: 'todo', cat: 'todo', q: '', orden: 'rel', ofertas: false, kit: leer(K_KIT, {}), nota: leer(K_NOTA, '') };
   let crudos = leer(K_PROD, null);
   let hayCambios = Array.isArray(crudos);
   if (!hayCambios) crudos = PRODUCTOS;
@@ -143,6 +144,9 @@
         id,
         categoria,
         precio: Number(p.precio) || 0,
+        precioAntes: Number(p.precioAntes) > Number(p.precio) ? Number(p.precioAntes) : 0,
+        descuento: Number(p.precioAntes) > Number(p.precio) ? Math.round((1 - p.precio / p.precioAntes) * 100) : 0,
+        sinStock: !!p.sinStock,
         tamano: p.tamano || '',
         tags: Array.isArray(p.tags) ? p.tags.slice(0, 3) : [],
         cod: `${c.pref}-${String(cuenta[categoria]).padStart(2, '0')}`,
@@ -198,7 +202,7 @@
 
   function elegirMundo(id) {
     if (!MUN[id]) id = MUNDOS[0].id;
-    estado.mundo = id;
+    estado.mundo = id; estado.ofertas = false;
     const m = MUN[id];
     $('#auto').dataset.mundo = id;
     $$('[data-lienzo]').forEach(l => { l.hidden = l.dataset.lienzo !== id; });
@@ -235,6 +239,7 @@
       l = enZona(estado.zona);
       if (estado.cat !== 'todo') l = l.filter(p => p.categoria === estado.cat);
     }
+    if (estado.ofertas) l = l.filter(p => p.descuento);
     l = l.slice();
     if (estado.orden === 'menor') l.sort((a, b) => a.precio - b.precio);
     if (estado.orden === 'mayor') l.sort((a, b) => b.precio - a.precio);
@@ -244,7 +249,10 @@
 
   function tarjeta(p, i) {
     const n = estado.kit[p.id] || 0;
-    return `<article class="card${p.destacado ? ' card--dest' : ''}" style="--c:${p.color};--i:${Math.min(i, 14)}" data-id="${esc(p.id)}">
+    const sello = p.sinStock ? '<span class="card__sello card__sello--gris">Sin stock</span>'
+      : p.descuento ? `<span class="card__sello card__sello--oferta">−${p.descuento}%</span>`
+      : p.destacado ? '<span class="card__sello">Destacado</span>' : '';
+    return `<article class="card${p.destacado ? ' card--dest' : ''}${p.sinStock ? ' card--agotado' : ''}" style="--c:${p.color};--i:${Math.min(i, 14)}" data-id="${esc(p.id)}">
       <button class="card__abrir" type="button" aria-label="Ver ${esc(p.nombre)}, ${fmt(p.precio)}">
         <span class="card__cod">${p.cod}</span>
         <span class="card__img">${visual(p)}</span>
@@ -253,11 +261,11 @@
           <span class="card__nom">${esc(p.nombre)}</span>
           <span class="card__tam">${esc(p.tamano)}</span>
           <span class="card__desc">${esc(p.descripcion || '')}</span>
-          <span class="card__precio">${fmt(p.precio)}</span>
+          <span class="card__precio">${p.descuento ? `<s>${fmt(p.precioAntes)}</s>` : ''}${fmt(p.precio)}</span>
         </span>
       </button>
-      ${p.destacado ? '<span class="card__sello">Destacado</span>' : ''}
-      <button class="card__mas${n ? ' on' : ''}" type="button" data-sumar aria-label="Agregar ${esc(p.nombre)} al kit">${n || '+'}</button>
+      ${sello}
+      ${p.sinStock ? '' : `<button class="card__mas${n ? ' on' : ''}" type="button" data-sumar aria-label="Agregar ${esc(p.nombre)} al kit">${n || '+'}</button>`}
     </article>`;
   }
 
@@ -266,7 +274,7 @@
   const comboItems = c => c.productos.map(ref => {
     const [nom, tam] = ref.split('|').map(x => plano(x).trim());
     return P.find(p => plano(p.nombre) === nom && (!tam || plano(p.tamano) === tam));
-  }).filter(Boolean);
+  }).filter(p => p && !p.sinStock);
 
   function pintarCombos() {
     const caja = $('#combos');
@@ -293,9 +301,13 @@
       ? `${l.length} ${l.length === 1 ? 'coincidencia' : 'coincidencias'} para “${estado.q}”`
       : `${l.length} ${l.length === 1 ? 'producto' : 'productos'}`;
     $('#chips').style.display = estado.q ? 'none' : '';
+    const nOf = (estado.q ? P : enZona(estado.zona)).filter(p => p.descuento).length, bo = $('#btnOfertas');
+    bo.hidden = !nOf && !estado.ofertas;
+    bo.setAttribute('aria-pressed', estado.ofertas);
+    $('i', bo).textContent = nOf;
     grid.innerHTML = l.length
       ? l.map(tarjeta).join('')
-      : `<div class="vacio"><b>Nada por acá</b><p>No encontramos productos con esa búsqueda.</p><button class="btn btn--linea" type="button" data-limpiar>Ver todo el catálogo</button></div>`;
+      : `<div class="vacio"><b>Nada por acá</b><p>${estado.ofertas && !estado.q ? 'No hay ofertas en esta sección por ahora.' : 'No encontramos productos con esa búsqueda.'}</p><button class="btn btn--linea" type="button" data-limpiar>Ver todo el catálogo</button></div>`;
   }
 
   /* =========================================================
@@ -316,7 +328,8 @@
 
   function mensajeWA() {
     const filas = kitItems().map(({ p, n }) => `• ${n} × ${p.nombre}${p.tamano ? ` (${p.tamano})` : ''} — ${fmt(p.precio * n)}`);
-    return `¡Hola! Quiero pedir este kit del catálogo:\n\n${filas.join('\n')}\n\nTotal estimado: ${fmt(kitTotal())}`;
+    const nota = estado.nota.trim();
+    return `¡Hola! Quiero pedir este kit del catálogo:\n\n${filas.join('\n')}\n\nTotal estimado: ${fmt(kitTotal())}${nota ? `\n\nNota: ${nota}` : ''}`;
   }
   const linkWA = txt => `https://wa.me/${String(TIENDA.whatsapp).replace(/\D/g, '')}?text=${encodeURIComponent(txt)}`;
 
@@ -338,7 +351,10 @@
               <output>${n}</output>
               <button type="button" data-kit="1" aria-label="Sumar uno de ${esc(p.nombre)}">+</button>
             </div>
-          </li>`).join('')}</ul>`
+          </li>`).join('')}</ul>
+        <label class="kit__nota">Nota para el pedido (opcional)
+          <textarea id="kitNota" rows="2" maxlength="240" placeholder="Ej: lo paso a buscar el sábado a la mañana.">${esc(estado.nota)}</textarea>
+        </label>`
       : `<div class="kit__vacio"><b>Tu kit está vacío</b><p>Tocá el + en cualquier producto para empezar a armarlo.</p></div>`;
 
     $('#kitPie').innerHTML = items.length
@@ -404,6 +420,15 @@
   let atrasPropio = 0;
   addEventListener('popstate', () => { if (atrasPropio) atrasPropio--; else cerrar(true); });
   addEventListener('keydown', e => { if (e.key === 'Escape') cerrar(); });
+  // con Tab el foco no se escapa de la hoja abierta
+  addEventListener('keydown', e => {
+    if (e.key !== 'Tab' || !hojaAbierta) return;
+    const f = $$('button, a[href], input, select, textarea', $('.hoja', hojaAbierta)).filter(el => !el.disabled && el.offsetParent !== null);
+    if (!f.length) return;
+    const pri = f[0], ult = f[f.length - 1], act = document.activeElement;
+    if (!hojaAbierta.contains(act) || (!e.shiftKey && act === ult)) { e.preventDefault(); pri.focus(); }
+    else if (e.shiftKey && act === pri) { e.preventDefault(); ult.focus(); }
+  });
 
   // arrastrar hacia abajo para cerrar (celular)
   function arrastrable(ov) {
@@ -442,14 +467,18 @@
   function pintarCompra() {
     const p = porId(fichaId); if (!p) return;
     const enKit = estado.kit[p.id] || 0;
-    $('#prodCompra').innerHTML = `
-      <div class="compra__precio"><small>${enKit ? `Ya tenés ${enKit} en el kit` : esc(p.tamano) || 'Precio'}</small><b>${fmt(p.precio * fichaCant)}</b></div>
-      <div class="cant">
-        <button type="button" data-cant="-1" aria-label="Menos">−</button>
-        <output aria-live="polite">${fichaCant}</output>
-        <button type="button" data-cant="1" aria-label="Más">+</button>
-      </div>
-      <button class="btn btn--ac" type="button" data-agregar>Agregar</button>`;
+    const tam = p.tamano ? ` (${p.tamano})` : '';
+    $('#prodCompra').innerHTML = p.sinStock
+      ? `<div class="compra__precio"><small>Sin stock por ahora</small><b>${fmt(p.precio)}</b></div>
+         <a class="btn btn--ac" target="_blank" rel="noopener" href="${esc(linkWA(`¡Hola! ¿Cuándo vuelve a entrar ${p.nombre}${tam}?`))}">Avisame cuando entre</a>`
+      : `<div class="compra__precio"><small>${enKit ? `Ya tenés ${enKit} en el kit` : p.descuento ? `Oferta −${p.descuento}%` : esc(p.tamano) || 'Precio'}</small>
+           <b>${p.descuento ? `<s>${fmt(p.precioAntes * fichaCant)}</s>` : ''}${fmt(p.precio * fichaCant)}</b></div>
+         <div class="cant">
+           <button type="button" data-cant="-1" aria-label="Menos">−</button>
+           <output aria-live="polite">${fichaCant}</output>
+           <button type="button" data-cant="1" aria-label="Más">+</button>
+         </div>
+         <button class="btn btn--ac" type="button" data-agregar>Agregar</button>`;
   }
 
   /* ---------- link propio de cada producto y compartir ---------- */
@@ -549,8 +578,28 @@
     });
 
     // búsqueda y orden
+    // sugerencias al tocar el buscador vacío
+    const sug = $('#sugeridos');
+    $('#q').addEventListener('focus', e => {
+      const lista = MUN[estado.mundo].busquedas || [];
+      sug.innerHTML = '<span>Probá con</span>' + lista.map(t => `<button type="button" data-sug="${esc(t)}">${esc(t)}</button>`).join('');
+      sug.hidden = !lista.length || !!e.target.value;
+    });
+    $('#q').addEventListener('blur', () => setTimeout(() => { sug.hidden = true; }, 160));
+    sug.addEventListener('pointerdown', e => e.preventDefault()); // que el buscador no pierda el foco
+    sug.addEventListener('click', e => {
+      const b = e.target.closest('[data-sug]'); if (!b) return;
+      const q = $('#q');
+      q.value = estado.q = b.dataset.sug;
+      sug.hidden = true; q.blur();
+      pintarGrilla();
+    });
+
+    $('#btnOfertas').addEventListener('click', () => { estado.ofertas = !estado.ofertas; pintarGrilla(); });
+
     let tq;
     $('#q').addEventListener('input', e => {
+      if (e.target.value) sug.hidden = true;
       clearTimeout(tq);
       tq = setTimeout(() => { estado.q = e.target.value.trim(); pintarGrilla(); }, 140);
     });
@@ -560,7 +609,7 @@
     // grilla
     $('#grid').addEventListener('click', e => {
       if (e.target.closest('[data-limpiar]')) {
-        estado.q = ''; $('#q').value = ''; elegirZona('todo'); return;
+        estado.q = ''; $('#q').value = ''; estado.ofertas = false; elegirZona('todo'); return;
       }
       const card = e.target.closest('.card'); if (!card) return;
       const id = card.dataset.id;
@@ -604,7 +653,17 @@
     $('#ovKit').addEventListener('click', e => {
       const k = e.target.closest('[data-kit]');
       if (k) return cambiarKit(k.closest('[data-id]').dataset.id, Number(k.dataset.kit));
-      if (e.target.closest('[data-vaciar]')) { estado.kit = {}; escribir(K_KIT, estado.kit); pintarKit(); pintarGrilla(); }
+      if (e.target.closest('[data-vaciar]')) {
+        estado.kit = {}; estado.nota = '';
+        escribir(K_KIT, estado.kit); escribir(K_NOTA, '');
+        pintarKit(); pintarGrilla();
+      }
+    });
+    $('#ovKit').addEventListener('input', e => {
+      if (e.target.id !== 'kitNota') return;
+      estado.nota = e.target.value;
+      escribir(K_NOTA, estado.nota);
+      const a = $('#kitPie a'); if (a) a.href = linkWA(mensajeWA());
     });
 
     // cerrar hojas
