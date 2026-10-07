@@ -8,6 +8,12 @@ const TIENDA = {
   // Número de WhatsApp con código de país, sin +, espacios ni guiones.
   whatsapp: "5491100000000",
   ciudad: "Buenos Aires",
+  // true: en el pedido se puede elegir entre retiro en el local y envío a domicilio.
+  envios: true,
+  // Opcionales: si los completás, aparecen al pie de la página.
+  direccion: "",   // ej: "Av. Siempre Viva 742"
+  horario: "",     // ej: "Lun a sáb de 9 a 19 h"
+  instagram: "",   // ej: "martin.autoyhogar"
 };
 
 /* Los dos mundos del catálogo. "accesorios" es la categoría que se

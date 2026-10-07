@@ -342,7 +342,8 @@
 </main>
 
 <footer class="pie">
-  <p><b data-tienda="nombre">MARTÍN</b> <span data-tienda="bajada">Car Care</span> · <span data-tienda="ciudad">Buenos Aires</span></p>
+  <p><b data-tienda="nombre">MARTÍN</b> <span data-tienda="bajada">Auto y Hogar</span> · <span data-tienda="ciudad">Buenos Aires</span></p>
+  <p class="pie__datos" id="pieDatos" hidden></p>
   <p class="pie__nota">Demo de catálogo. Precios y productos de ejemplo.</p>
 </footer>
 
@@ -458,6 +459,7 @@
         <p class="form__error campo--ancho" id="fError" role="alert" hidden></p>
         <div class="form__acc campo--ancho">
           <button class="btn btn--ac" type="submit" id="fGuardar">Agregar al catálogo</button>
+          <button class="btn btn--linea" type="submit" id="fDuplicar" hidden>Guardar como nuevo</button>
           <button class="btn btn--txt" type="button" id="fCancelar" hidden>Cancelar edición</button>
         </div>
       </form>
@@ -465,7 +467,7 @@
       <!-- Pegar de Excel -->
       <div class="tabp" data-panel="excel" hidden>
         <p class="form__ayuda">Copiá las filas de tu Excel o Google Sheets y pegalas acá. Columnas, en este orden:</p>
-        <p class="columnas"><span>Nombre</span><span>Categoría</span><span>Precio</span><span>Tamaño</span><span>Descripción</span></p>
+        <p class="columnas"><span>Nombre</span><span>Categoría</span><span>Precio</span><span>Tamaño</span><span>Descripción</span><span>Precio anterior (opcional)</span></p>
         <label class="campo campo--ancho"><span class="vh">Filas pegadas</span>
           <textarea id="xTexto" rows="9" spellcheck="false" placeholder="Shampoo Neutro pH7&#9;Lavado&#9;13900&#9;1 L&#9;Alta lubricación, no saca la cera"></textarea>
         </label>
@@ -490,6 +492,7 @@
       <p id="cargaEstado"></p>
       <div>
         <button class="btn btn--ac btn--ch" type="button" id="btnExportar">Descargar productos.js</button>
+        <button class="btn btn--linea btn--ch" type="button" id="btnCsv">Descargar para Excel</button>
         <button class="btn btn--linea btn--ch" type="button" id="btnRestaurar">Restaurar original</button>
       </div>
     </footer>

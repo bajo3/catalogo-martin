@@ -19,10 +19,12 @@
   const K_PROD = 'martin.productos';
   const K_KIT = 'martin.kit';
   const K_NOTA = 'martin.nota';
+  const K_DATOS = 'martin.datos';
   const leer = (k, def) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } };
   const escribir = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } };
 
-  const estado = { mundo: MUNDOS[0].id, zona: 'todo', cat: 'todo', q: '', orden: 'rel', ofertas: false, kit: leer(K_KIT, {}), nota: leer(K_NOTA, '') };
+  const estado = { mundo: MUNDOS[0].id, zona: 'todo', cat: 'todo', q: '', orden: 'rel', ofertas: false, kit: leer(K_KIT, {}), nota: leer(K_NOTA, ''),
+    datos: { nombre: '', entrega: 'retiro', direccion: '', ...leer(K_DATOS, {}) } };
   let crudos = leer(K_PROD, null);
   let hayCambios = Array.isArray(crudos);
   if (!hayCambios) crudos = PRODUCTOS;
@@ -227,12 +229,41 @@
       ).join('');
   }
 
+  const textoDe = p => plano(`${p.nombre} ${p.descripcion || ''} ${p.tags.join(' ')} ${CAT[p.categoria].nombre} ${ZON[CAT[p.categoria].zona].nombre} ${p.cod}`);
+
+  /* ---------- "¿quisiste decir…?" cuando la búsqueda no encuentra nada ---------- */
+  function distancia(a, b) {
+    const f = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+      let prev = f[0];
+      f[0] = i;
+      for (let j = 1; j <= b.length; j++) {
+        const t = f[j];
+        f[j] = Math.min(f[j] + 1, f[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+        prev = t;
+      }
+    }
+    return f[b.length];
+  }
+
+  function quisoDecir(q) {
+    const vocab = [...new Set(P.flatMap(p => plano(`${p.nombre} ${CAT[p.categoria].nombre}`).split(/[^a-z0-9]+/)).filter(w => w.length > 3))];
+    let cambio = false;
+    const palabras = plano(q).split(/\s+/).filter(Boolean).map(w => {
+      if (w.length < 4 || vocab.some(v => v.includes(w))) return w;
+      const [d, mejor] = vocab.map(v => [distancia(w, v), v]).sort((x, y) => x[0] - y[0])[0] || [];
+      if (mejor && d <= Math.max(1, Math.floor(w.length / 4))) { cambio = true; return mejor; }
+      return w;
+    });
+    return cambio && P.some(p => palabras.every(x => textoDe(p).includes(x))) ? palabras.join(' ') : '';
+  }
+
   function filtrar() {
     let l;
     if (estado.q) {
       const q = plano(estado.q).split(/\s+/).filter(Boolean);
       l = P.filter(p => {
-        const t = plano(`${p.nombre} ${p.descripcion || ''} ${p.tags.join(' ')} ${CAT[p.categoria].nombre} ${ZON[CAT[p.categoria].zona].nombre} ${p.cod}`);
+        const t = textoDe(p);
         return q.every(x => t.includes(x));
       });
     } else {
@@ -247,12 +278,21 @@
     return l;
   }
 
+  // botón + o, si ya está en el kit, barra para sumar y restar
+  const controles = p => {
+    const n = estado.kit[p.id] || 0;
+    if (p.sinStock) return '';
+    return n
+      ? `<div class="card__kit"><button type="button" data-restar aria-label="Quitar uno de ${esc(p.nombre)}">−</button><span><b>${n}</b><i> en el kit</i></span><button type="button" data-sumar aria-label="Sumar uno de ${esc(p.nombre)}">+</button></div>`
+      : `<button class="card__mas" type="button" data-sumar aria-label="Agregar ${esc(p.nombre)} al kit">+</button>`;
+  };
+
   function tarjeta(p, i) {
     const n = estado.kit[p.id] || 0;
     const sello = p.sinStock ? '<span class="card__sello card__sello--gris">Sin stock</span>'
       : p.descuento ? `<span class="card__sello card__sello--oferta">−${p.descuento}%</span>`
       : p.destacado ? '<span class="card__sello">Destacado</span>' : '';
-    return `<article class="card${p.destacado ? ' card--dest' : ''}${p.sinStock ? ' card--agotado' : ''}" style="--c:${p.color};--i:${Math.min(i, 14)}" data-id="${esc(p.id)}">
+    return `<article class="card${p.destacado ? ' card--dest' : ''}${p.sinStock ? ' card--agotado' : ''}${n ? ' card--enkit' : ''}" style="--c:${p.color};--i:${Math.min(i, 14)}" data-id="${esc(p.id)}">
       <button class="card__abrir" type="button" aria-label="Ver ${esc(p.nombre)}, ${fmt(p.precio)}">
         <span class="card__cod">${p.cod}</span>
         <span class="card__img">${visual(p)}</span>
@@ -265,7 +305,7 @@
         </span>
       </button>
       ${sello}
-      ${p.sinStock ? '' : `<button class="card__mas${n ? ' on' : ''}" type="button" data-sumar aria-label="Agregar ${esc(p.nombre)} al kit">${n || '+'}</button>`}
+      <div class="card__ctl">${controles(p)}</div>
     </article>`;
   }
 
@@ -295,6 +335,7 @@
   function pintarGrilla() {
     pintarCombos();
     const l = filtrar(), grid = $('#grid');
+    const quiso = !l.length && estado.q ? quisoDecir(estado.q) : '';
     const z = zonaInfo(estado.zona);
     $('#catTitulo').textContent = estado.q ? 'Resultados' : estado.cat !== 'todo' ? CAT[estado.cat].nombre : z.nombre;
     $('#catCuenta').textContent = estado.q
@@ -307,7 +348,10 @@
     $('i', bo).textContent = nOf;
     grid.innerHTML = l.length
       ? l.map(tarjeta).join('')
-      : `<div class="vacio"><b>Nada por acá</b><p>${estado.ofertas && !estado.q ? 'No hay ofertas en esta sección por ahora.' : 'No encontramos productos con esa búsqueda.'}</p><button class="btn btn--linea" type="button" data-limpiar>Ver todo el catálogo</button></div>`;
+      : `<div class="vacio"><b>Nada por acá</b>
+          <p>${estado.ofertas && !estado.q ? 'No hay ofertas en esta sección por ahora.' : 'No encontramos productos con esa búsqueda.'}</p>
+          ${quiso ? `<p class="vacio__quiso">¿Quisiste decir <button type="button" data-quiso="${esc(quiso)}">${esc(quiso)}</button>?</p>` : ''}
+          <button class="btn btn--linea" type="button" data-limpiar>Ver todo el catálogo</button></div>`;
   }
 
   /* =========================================================
@@ -322,14 +366,15 @@
     if (n) estado.kit[id] = n; else delete estado.kit[id];
     escribir(K_KIT, estado.kit);
     pintarKit();
-    const b = $(`.card[data-id="${CSS.escape(id)}"] .card__mas`);
-    if (b) { b.textContent = n || '+'; b.classList.toggle('on', n > 0); }
+    const card = $(`.card[data-id="${CSS.escape(id)}"]`), p = porId(id);
+    if (card && p) { $('.card__ctl', card).innerHTML = controles(p); card.classList.toggle('card--enkit', n > 0); }
   }
 
   function mensajeWA() {
     const filas = kitItems().map(({ p, n }) => `• ${n} × ${p.nombre}${p.tamano ? ` (${p.tamano})` : ''} — ${fmt(p.precio * n)}`);
-    const nota = estado.nota.trim();
-    return `¡Hola! Quiero pedir este kit del catálogo:\n\n${filas.join('\n')}\n\nTotal estimado: ${fmt(kitTotal())}${nota ? `\n\nNota: ${nota}` : ''}`;
+    const d = estado.datos, nombre = d.nombre.trim(), dir = d.direccion.trim(), nota = estado.nota.trim();
+    const entrega = !TIENDA.envios ? '' : d.entrega === 'envio' ? `\nEntrega: envío a domicilio${dir ? ` (${dir})` : ''}` : '\nEntrega: retiro en el local';
+    return `¡Hola!${nombre ? ` Soy ${nombre}.` : ''} Quiero pedir este kit del catálogo:\n\n${filas.join('\n')}\n\nTotal estimado: ${fmt(kitTotal())}${entrega}${nota ? `\nNota: ${nota}` : ''}`;
   }
   const linkWA = txt => `https://wa.me/${String(TIENDA.whatsapp).replace(/\D/g, '')}?text=${encodeURIComponent(txt)}`;
 
@@ -352,9 +397,22 @@
               <button type="button" data-kit="1" aria-label="Sumar uno de ${esc(p.nombre)}">+</button>
             </div>
           </li>`).join('')}</ul>
-        <label class="kit__nota">Nota para el pedido (opcional)
-          <textarea id="kitNota" rows="2" maxlength="240" placeholder="Ej: lo paso a buscar el sábado a la mañana.">${esc(estado.nota)}</textarea>
-        </label>`
+        <div class="kit__datos">
+          <label class="kit__campo">Tu nombre
+            <input data-dato="nombre" maxlength="60" autocomplete="name" placeholder="Para saber de quién es el pedido" value="${esc(estado.datos.nombre)}">
+          </label>
+          ${TIENDA.envios ? `<fieldset class="kit__entrega">
+            <legend>Entrega</legend>
+            <label><input type="radio" name="entrega" data-dato="entrega" value="retiro"${estado.datos.entrega === 'envio' ? '' : ' checked'}><span>Retiro en el local</span></label>
+            <label><input type="radio" name="entrega" data-dato="entrega" value="envio"${estado.datos.entrega === 'envio' ? ' checked' : ''}><span>Envío a domicilio</span></label>
+          </fieldset>
+          <label class="kit__campo" id="kitDir"${estado.datos.entrega === 'envio' ? '' : ' hidden'}>Dirección de envío
+            <input data-dato="direccion" maxlength="120" autocomplete="street-address" placeholder="Calle, número y localidad" value="${esc(estado.datos.direccion)}">
+          </label>` : ''}
+          <label class="kit__campo">Nota (opcional)
+            <textarea id="kitNota" rows="2" maxlength="240" placeholder="Ej: lo paso a buscar el sábado a la mañana.">${esc(estado.nota)}</textarea>
+          </label>
+        </div>`
       : `<div class="kit__vacio"><b>Tu kit está vacío</b><p>Tocá el + en cualquier producto para empezar a armarlo.</p></div>`;
 
     $('#kitPie').innerHTML = items.length
@@ -626,14 +684,18 @@
       if (e.target.closest('[data-limpiar]')) {
         estado.q = ''; $('#q').value = ''; estado.ofertas = false; elegirZona('todo'); return;
       }
+      const quiso = e.target.closest('[data-quiso]');
+      if (quiso) { $('#q').value = estado.q = quiso.dataset.quiso; pintarGrilla(); return; }
       const card = e.target.closest('.card'); if (!card) return;
       const id = card.dataset.id;
+      if (e.target.closest('[data-restar]')) return cambiarKit(id, -1);
       const mas = e.target.closest('[data-sumar]');
       if (mas) {
-        cambiarKit(id, 1);
+        const primero = !estado.kit[id];
         volar(mas, porId(id).color);
-        toast(`${porId(id).nombre} sumado al kit`);
-      } else abrirProducto(id);
+        cambiarKit(id, 1);
+        if (primero) toast(`${porId(id).nombre} sumado al kit`);
+      } else if (!e.target.closest('.card__kit')) abrirProducto(id);
     });
 
     // kits armados
@@ -675,9 +737,15 @@
       }
     });
     $('#ovKit').addEventListener('input', e => {
-      if (e.target.id !== 'kitNota') return;
-      estado.nota = e.target.value;
-      escribir(K_NOTA, estado.nota);
+      const t = e.target;
+      if (t.id === 'kitNota') {
+        estado.nota = t.value;
+        escribir(K_NOTA, estado.nota);
+      } else if (t.dataset.dato) {
+        estado.datos[t.dataset.dato] = t.value;
+        escribir(K_DATOS, estado.datos);
+        if (t.dataset.dato === 'entrega') $('#kitDir').hidden = t.value !== 'envio';
+      } else return;
       const a = $('#kitPie a'); if (a) a.href = linkWA(mensajeWA());
     });
 
@@ -719,6 +787,11 @@
     $$('[data-tienda]').forEach(el => { const v = TIENDA[el.dataset.tienda]; if (v) el.textContent = v; });
     document.title = `${TIENDA.nombre} ${TIENDA.bajada} — Catálogo de limpieza para el auto y el hogar`;
     $('#waDirecto').href = linkWA('¡Hola! Vi el catálogo y quiero hacer una consulta.');
+    const datos = [TIENDA.direccion, TIENDA.horario].filter(Boolean).map(esc);
+    const ig = String(TIENDA.instagram || '').replace(/^@/, '');
+    if (ig) datos.push(`<a href="https://instagram.com/${encodeURIComponent(ig)}" target="_blank" rel="noopener">@${esc(ig)}</a>`);
+    $('#pieDatos').hidden = !datos.length;
+    $('#pieDatos').innerHTML = datos.join(' · ');
     $('#heroEnv').innerHTML = envaseSVG('botella', 'LV-02') + envaseSVG('gatillo', 'BA-03') + envaseSVG('bidon', 'CO-01');
   }
 

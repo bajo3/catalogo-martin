@@ -474,7 +474,7 @@ a { color: inherit; -webkit-tap-highlight-color: transparent; }
   overflow-wrap: anywhere;
 }
 .card__tam { font-size: 13px; color: var(--mu); }
-.card__precio { display: block; margin-top: auto; padding: 12px 44px 0 0; font: 500 16px/1 var(--fm); }
+.card__precio { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px 6px; margin-top: auto; padding: 12px 50px 0 0; font: 500 16px/1 var(--fm); }
 .card__mas {
   position: absolute; right: 8px; bottom: 8px;
   width: 44px; height: 44px; border-radius: 50%;
@@ -496,7 +496,20 @@ a { color: inherit; -webkit-tap-highlight-color: transparent; }
   .card:hover .card__img svg, .card:hover .card__img img { transform: translateY(-6px) rotate(-5deg) scale(1.04); }
   .card__mas:hover { transform: scale(1.1); }
 }
-.card__precio s { margin-right: 6px; font-size: .78em; color: var(--mu); }
+.card__precio s { font-size: .78em; color: var(--mu); }
+.card__kit {
+  position: absolute; left: 8px; right: 8px; bottom: 8px; height: 44px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-radius: 999px; background: var(--c); color: #0a0b0e;
+  font: 500 12px/1 var(--fm); letter-spacing: .04em;
+}
+.card__kit button { width: 46px; height: 44px; color: inherit; font: 500 22px/1 var(--fm); }
+.card__kit b { font-size: 16px; }
+.card:not(.card--dest) .card__kit i { display: none; }
+.card__kit i { font-style: normal; text-transform: uppercase; }
+.card--enkit .card__abrir { padding-bottom: 64px; }
+.card--enkit .card__precio { padding-right: 0; }
+.vacio__quiso button { color: var(--ac); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; padding: 0 4px; }
 .card__sello--oferta { background: var(--tx); font-size: 11px; transform: rotate(-3deg); }
 .card__sello--gris { background: #3a3f48; color: #cfcbc2; transform: none; }
 .card--agotado .card__img { opacity: .38; filter: grayscale(1); }
@@ -529,6 +542,7 @@ a { color: inherit; -webkit-tap-highlight-color: transparent; }
   max-width: 1240px; margin-inline: auto;
 }
 .pie b { font: 800 18px/1 var(--fd); color: var(--tx); letter-spacing: .03em; }
+.pie__datos a { color: var(--tx); }
 .pie__nota { font: 400 11px/1.4 var(--fm); letter-spacing: .06em; text-transform: uppercase; }
 /* ---------- barra del kit ---------- */
 .kitbar {
@@ -684,13 +698,25 @@ a { color: inherit; -webkit-tap-highlight-color: transparent; }
 .kit__item span { display: block; margin-top: 5px; font: 500 12px/1 var(--fm); color: var(--mu); }
 .kit__item .cant { height: 40px; }
 .kit__item .cant button { width: 36px; height: 38px; }
-.kit__nota { display: grid; gap: 6px; margin: 4px 18px 16px; font: 500 11px/1.2 var(--fm); letter-spacing: .08em; text-transform: uppercase; color: var(--mu); }
-.kit__nota textarea {
-  width: 100%; padding: 12px 14px; resize: vertical;
+.kit__datos { display: grid; gap: 12px; margin: 6px 18px 18px; padding-top: 14px; border-top: 1px solid var(--ln); }
+.kit__campo, .kit__entrega legend { display: grid; gap: 6px; font: 500 11px/1.2 var(--fm); letter-spacing: .08em; text-transform: uppercase; color: var(--mu); }
+.kit__campo input, .kit__campo textarea {
+  width: 100%; min-height: 48px; padding: 12px 14px; resize: vertical;
   background: var(--p2); border: 1px solid var(--ln); border-radius: 12px; outline: 0;
   font: 400 16px/1.35 var(--fb); letter-spacing: 0; text-transform: none; color: var(--tx);
 }
-.kit__nota textarea:focus { border-color: var(--ac); }
+.kit__campo input:focus, .kit__campo textarea:focus { border-color: var(--ac); }
+.kit__entrega { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.kit__entrega legend { padding: 0; margin-bottom: 6px; }
+.kit__entrega label { position: relative; display: block; }
+.kit__entrega input { position: absolute; opacity: 0; inset: 0; }
+.kit__entrega span {
+  display: grid; place-items: center; min-height: 48px; padding: 0 8px;
+  border: 1px solid var(--ln); border-radius: 12px; background: var(--p2);
+  font-size: 14px; text-align: center; transition: background .2s, color .2s, border-color .2s;
+}
+.kit__entrega input:checked + span { background: var(--tx); border-color: var(--tx); color: #0a0b0e; font-weight: 600; }
+.kit__entrega input:focus-visible + span { outline: 2px solid var(--ac); outline-offset: 2px; }
 .kit__vacio { padding: 30px 18px 46px; text-align: center; color: var(--mu); }
 .kit__vacio b { display: block; margin-bottom: 6px; font: 800 30px/1 var(--fd); text-transform: uppercase; color: var(--tx); }
 .compra--kit { flex-wrap: wrap; }

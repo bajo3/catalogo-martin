@@ -98,6 +98,7 @@
     $('#fModo').textContent = 'Producto nuevo';
     $('#fGuardar').textContent = 'Agregar al catálogo';
     $('#fCancelar').hidden = true;
+    $('#fDuplicar').hidden = true;
     $('#fError').hidden = true;
     $$('.mal', f).forEach(el => el.classList.remove('mal'));
     previa();
@@ -121,6 +122,7 @@
     $('#fModo').textContent = 'Editando producto';
     $('#fGuardar').textContent = 'Guardar cambios';
     $('#fCancelar').hidden = false;
+    $('#fDuplicar').hidden = false;
     previa(); pestana('nuevo');
   }
 
@@ -139,8 +141,10 @@
       (!p.nombre ? f.nombre : f.precio).focus();
       return;
     }
-    if (editando >= 0) {
-      if (lista[editando].color) p.color = lista[editando].color;
+    // "Guardar como nuevo" deja el original como está y suma una copia con los cambios
+    const comoNuevo = e.submitter && e.submitter.id === 'fDuplicar';
+    if (editando >= 0 && lista[editando].color) p.color = lista[editando].color;
+    if (editando >= 0 && !comoNuevo) {
       lista[editando] = p;
       guardar(`“${p.nombre}” actualizado`);
     } else {
@@ -190,10 +194,11 @@
 
   function leerPegado(txt) {
     return filasDe(txt)
-      .map(([nombre, cat, precio, tamano, descripcion]) => {
+      .map(([nombre, cat, precio, tamano, descripcion, antes]) => {
         const p = { nombre, categoria: categoriaDe(cat), precio: aPrecio(precio) };
         if (tamano) p.tamano = tamano;
         if (descripcion) p.descripcion = descripcion;
+        if (aPrecio(antes) > p.precio) p.precioAntes = aPrecio(antes);
         return p;
       })
       .filter(p => p.nombre && p.precio > 0);
@@ -267,6 +272,19 @@
     document.body.append(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
     C.toast('productos.js descargado');
+  });
+
+  /* ---------- descargar la lista para abrir en Excel ---------- */
+  $('#btnCsv').addEventListener('click', () => {
+    const celda = v => { const t = String(v ?? ''); return /[";\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; };
+    const filas = [['Nombre', 'Categoría', 'Precio', 'Tamaño', 'Descripción', 'Precio anterior'],
+      ...lista.map(p => [p.nombre, (CAT[p.categoria] || CAT.accesorios).nombre, p.precio, p.tamano, p.descripcion, p.precioAntes])];
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['﻿' + filas.map(f => f.map(celda).join(';')).join('\r\n')], { type: 'text/csv;charset=utf-8' }));
+    a.download = 'productos.csv';
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    C.toast('productos.csv descargado');
   });
 
   $('#btnRestaurar').addEventListener('click', e => {
